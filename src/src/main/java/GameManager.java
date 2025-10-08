@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Random;
 
 public class GameManager extends JPanel implements KeyListener, Runnable {
-    private static final int GAME_WIDTH = 600;
-    private static final int GAME_HEIGHT = 600;
+    protected static final int GAME_WIDTH = 600;
+    protected static final int GAME_HEIGHT = 600;
 
     private Paddle paddle;
     private Ball ball;
@@ -197,14 +197,5 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyTyped(KeyEvent e) {}
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Breakout Game");
-        GameManager gameManager = new GameManager();
-        frame.add(gameManager);
-        frame.setSize(GAME_WIDTH, GAME_HEIGHT);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setResizable(false);
-        gameManager.startGame();
-    }
+
 }

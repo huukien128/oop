@@ -1,3 +1,5 @@
+import java.awt.*;
+
 class NormalBrick extends Brick {
 
     public NormalBrick(int x, int y, int width, int height) {

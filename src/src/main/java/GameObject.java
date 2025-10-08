@@ -2,10 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class GameObject {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    protected int x;
+    protected int y;
+    protected int width;
+    protected int height;
 
     public GameObject(int x, int y, int width, int height) {
         this.x = x;
@@ -18,7 +18,6 @@ public abstract class GameObject {
     }
 
     public void update() {}
-    public void draw(Graphics g) {}
 
     public int getX() {
         return x;
@@ -40,4 +39,6 @@ public abstract class GameObject {
         return new Rectangle(x, y, width, height).intersects(new
                 Rectangle(obj.getX(),obj.getY(),obj.getWidth(),obj.getHeight()));
     }
+
+    public abstract void render(Graphics g);
 }

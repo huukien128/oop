@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public class FastBallPowerUp extends PowerUp {
     private static final int BOOST_AMOUNT = 3;
 

@@ -1,4 +1,6 @@
-class BonusBrick extends Brick {
+import java.awt.*;
+
+public class BonusBrick extends Brick {
 
     private boolean powerUpSpawned = false;
 

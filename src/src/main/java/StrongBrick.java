@@ -1,11 +1,12 @@
-class StrongBrick extends Brick {
+import java.awt.*;
 
+class StrongBrick extends Brick {
     public StrongBrick(int x, int y, int width, int height) {
         super(x, y, width, height, 2, "Strong");
     }
 
     @Override
-    public void update() { }
+    public void update() {}
 
     @Override
     public void render(Graphics g) {

@@ -1,6 +1,8 @@
-public class PowerUp extends GameObject {
+import java.awt.*;
+
+public abstract class PowerUp extends GameObject {
     private String type;
-    private int duration;
+    public int duration;
 
     public PowerUp(int x, int y, int width, int height, String type, int duration) {
         super(x, y, width, height);
@@ -8,8 +10,9 @@ public class PowerUp extends GameObject {
         this.duration = duration;
     }
 
-    public void applyEffect(Paddle paddle, Ball ball);
-    public void removeEffect(Paddle paddle, Ball ball);
+    public void applyEffect(Paddle paddle, Ball ball) {}
+
+    public void removeEffect(Paddle paddle, Ball ball) {}
 
     @Override
     public void update() {
@@ -17,7 +20,9 @@ public class PowerUp extends GameObject {
     }
 
     @Override
-    public void render(Graphics g);
+    public void render(Graphics g) {
+
+    }
 
     public String getType() {
         return type;

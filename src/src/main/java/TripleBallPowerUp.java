@@ -1,5 +1,3 @@
-import java.awt.*;
-
 public class TripleBallPowerUp extends PowerUp {
 
     public TripleBallPowerUp(int x, int y, int width, int height) {

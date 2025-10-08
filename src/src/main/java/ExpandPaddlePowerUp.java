@@ -1,5 +1,3 @@
-import java.awt.*;
-
 public class ExpandPaddlePowerUp extends PowerUp {
     private static final int EXPAND_AMOUNT = 50;
 

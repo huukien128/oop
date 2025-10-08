@@ -3,12 +3,12 @@ import java.awt.*;
 public class TripleBallPowerUp extends PowerUp {
 
     public TripleBallPowerUp(int x, int y, int width, int height) {
-        super(x, y, width, height, "TripleBall", 0); // hiệu ứng tức thời
+        super(x, y, width, height, "TripleBall", 0);
     }
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        // Xóa bóng hiện tại khỏi danh sách
+
         Game.balls.remove(ball);
 
         int startX = paddle.x + paddle.width / 2 - ball.width / 2;

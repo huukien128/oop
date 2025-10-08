@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class GameManager extends JPanel implements KeyListener, Runnable {
-    protected static final int GAME_WIDTH = 600;
+    protected static final int GAME_WIDTH = 800;
     protected static final int GAME_HEIGHT = 600;
 
     private Paddle paddle;
@@ -29,26 +29,27 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void initGame() {
-        int PADDLE_SPEED = 10;
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 100, 20, PADDLE_SPEED);
-        int BALL_START_SPEED = 5;
-        ball = new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 15, 15, BALL_START_SPEED, 1, -1);
+        int PADDLE_SPEED = 100;
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
+        int BALL_START_SPEED = 2;
+        ball = new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 20, 20, BALL_START_SPEED, 1, -1);
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         score = 0;
         gameState = "playing";
 
         // Tạo layout gạch
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (i % 2 == 0) {
-                    bricks.add(new NormalBrick(j * 60 + 20, i * 30 + 50, 50, 20));
-                } else {
-                    bricks.add(new StrongBrick(j * 60 + 20, i * 30 + 50, 50, 20));
+            for (int i = 0; i < 5; i++) {
+                // Chỉ tạo 9 viên gạch trên mỗi hàng
+                for (int j = 0; j < 9; j++) {
+                    if (i % 2 == 0) {
+                        bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20));
+                    } else {
+                        bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20));
+                    }
                 }
             }
         }
-    }
 
     public void startGame() {
         Thread gameThread = new Thread(this);
@@ -61,7 +62,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
 
         // Cập nhật vị trí của bóng và paddle
-        ball.update();
+        ball.update(); {
+            // Kiểm tra va chạm với tường trái hoặc phải
+            if (ball.getX() <= 0 || ball.getX() >= GAME_WIDTH - ball.getWidth()) {
+                ball.dx = -ball.dx; // Đổi hướng di chuyển theo chiều ngang
+            }
+
+            // Kiểm tra va chạm với tường trên
+            if (ball.getY() <= 0) {
+                ball.dy = -ball.dy; // Đổi hướng di chuyển theo chiều dọc
+            }
+        }
 
         // Cập nhật vị trí của các power-up đang rơi
         for (PowerUp pu : powerUps) {

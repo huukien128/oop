@@ -16,7 +16,7 @@ public abstract class PowerUp extends GameObject {
 
     @Override
     public void update() {
-        y += 2;
+        y += 1;
     }
 
     @Override

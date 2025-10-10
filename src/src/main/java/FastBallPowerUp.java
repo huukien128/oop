@@ -1,7 +1,7 @@
 import java.awt.*;
 
 public class FastBallPowerUp extends PowerUp {
-    private static final int BOOST_AMOUNT = 1;
+    private static final int BOOST_AMOUNT = 3;
 
     public FastBallPowerUp(int x, int y, int width, int height) {
         super(x, y, width, height, "FastBall", 5000);

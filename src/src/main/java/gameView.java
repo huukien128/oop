@@ -7,8 +7,10 @@ public class gameView {
         frame.add(gameManager);
         frame.setSize(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.requestFocus();
         frame.setVisible(true);
         frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
         gameManager.startGame();
     }
 }

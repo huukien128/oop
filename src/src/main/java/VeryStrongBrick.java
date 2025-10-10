@@ -1,8 +1,8 @@
 import java.awt.*;
 
-class StrongBrick extends Brick {
-    public StrongBrick(int x, int y, int width, int height) {
-        super(x, y, width, height, 2, "Strong");
+class VeryStrongBrick extends Brick {
+    public VeryStrongBrick(int x, int y, int width, int height) {
+        super(x, y, width, height, 3, "VeryStrong");
     }
 
     @Override
@@ -12,7 +12,8 @@ class StrongBrick extends Brick {
     public void render(Graphics g) {
         if (!isDestroyed()) {
             int hp = getHitPoints();
-            if (hp == 2) g.setColor(Color.ORANGE);
+            if (hp == 3) g.setColor(Color.RED);
+            else if (hp == 2) g.setColor(Color.ORANGE);
             else g.setColor(Color.YELLOW);
             g.fillRect(getX(), getY(), getWidth(), getHeight());
             g.setColor(Color.BLACK);

@@ -12,6 +12,10 @@ abstract class Brick extends GameObject {
         hitPoints--;
     }
 
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
     public boolean isDestroyed() {
         return hitPoints <= 0;
     }

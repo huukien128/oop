@@ -12,7 +12,7 @@ class NormalBrick extends Brick {
     @Override
     public void render(Graphics g) {
         if (!isDestroyed()) {
-            g.setColor(Color.GREEN);
+            g.setColor(Color.YELLOW);
             g.fillRect(getX(), getY(), getWidth(), getHeight());
             g.setColor(Color.BLACK);
             g.drawRect(getX(), getY(), getWidth(), getHeight());

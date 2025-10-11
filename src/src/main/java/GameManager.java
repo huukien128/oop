@@ -12,13 +12,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     protected static final int GAME_HEIGHT = 600;
 
     private Paddle paddle;
-    private Ball ball;
+    private List<Ball> balls;
     private List<Brick> bricks;
     private List<PowerUp> powerUps;
     private int score;
     private String gameState;
 
-    // Biến để quản lý hiệu ứng power-up
     private PowerUp activePowerUp;
     private long powerUpStartTime;
 
@@ -31,16 +30,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private void initGame() {
         int PADDLE_SPEED = 100;
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
+        balls = new ArrayList<>();
         int BALL_START_SPEED = 2;
-        ball = new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 20, 20, BALL_START_SPEED, 1, -1);
+        balls.add(new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 20, 20, BALL_START_SPEED, 1, -1));
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         score = 0;
         gameState = "playing";
 
-        // Tạo layout gạch
         for (int i = 0; i < 5; i++) {
-            // Chỉ tạo 9 viên gạch trên mỗi hàng
             for (int j = 0; j < 9; j++) {
                 if (i % 3 == 0) {
                     bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20));
@@ -53,7 +51,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
     }
 
-
     public void startGame() {
         Thread gameThread = new Thread(this);
         gameThread.start();
@@ -64,69 +61,96 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             return;
         }
 
-        // Cập nhật vị trí của bóng và paddle
-        ball.update(); {
+        // Cập nhật vị trí của paddle
+        paddle.update();
+
+        // Lặp qua tất cả các quả bóng để cập nhật vị trí và va chạm
+        Iterator<Ball> ballIterator = balls.iterator();
+        while (ballIterator.hasNext()) {
+            Ball ball = ballIterator.next();
+            ball.update();
+
+            // Xử lý va chạm với tường (trái, phải và trên cùng)
             if (ball.getX() <= 0 || ball.getX() >= GAME_WIDTH - ball.getWidth()) {
-                ball.dx = -ball.dx; // Đổi hướng di chuyển theo chiều ngang
+                ball.dx = -ball.dx;
             }
-
-            // Kiểm tra va chạm với tường trên
             if (ball.getY() <= 0) {
-                ball.dy = -ball.dy; // Đổi hướng di chuyển theo chiều dọc
+                ball.dy = -ball.dy;
+            }
+
+            // Xử lý va chạm bóng với các đối tượng khác
+            checkBallCollisions(ball);
+
+            // Kiểm tra xem bóng có rơi khỏi màn hình không
+            if (ball.getY() > GAME_HEIGHT) {
+                ballIterator.remove();
             }
         }
 
-        // Cập nhật vị trí của các power-up đang rơi
-        for (PowerUp pu : powerUps) {
-            pu.update();
+        // Kiểm tra điều kiện Game Over: khi không còn quả bóng nào
+        if (balls.isEmpty()) {
+            gameState = "gameOver";
         }
 
-        checkCollisions();
+        // Cập nhật vị trí và xử lý va chạm của các power-up đang rơi
+        Iterator<PowerUp> powerUpIterator = powerUps.iterator();
+        while (powerUpIterator.hasNext()) {
+            PowerUp pu = powerUpIterator.next();
+            pu.update();
+
+            // Va chạm giữa paddle và power-up
+            if (pu.checkCollision(paddle)) {
+                if (pu instanceof Multiball) {
+                    if (!balls.isEmpty()) {
+                        pu.applyEffect(paddle, balls.get(0));
+                    }
+                } else {
+                    if (activePowerUp != null) {
+                        activePowerUp.removeEffect(paddle, balls.get(0));
+                    }
+                    activePowerUp = pu;
+                    if (!balls.isEmpty()) {
+                        activePowerUp.applyEffect(paddle, balls.get(0));
+                    }
+                    powerUpStartTime = System.currentTimeMillis();
+                }
+                powerUpIterator.remove();
+            }
+        }
+
         checkPowerUpDuration();
         checkGameOver();
     }
 
-    private void checkCollisions() {
+    private void checkBallCollisions(Ball ball) {
         // Va chạm giữa bóng và paddle
         if (ball.checkCollision(paddle)) {
             ball.bounceOffObject(paddle);
         }
 
         // Va chạm giữa bóng và các viên gạch
-        for (Brick brick : bricks) {
+        Iterator<Brick> brickIterator = bricks.iterator();
+        while (brickIterator.hasNext()) {
+            Brick brick = brickIterator.next();
             if (!brick.isDestroyed() && ball.checkCollision(brick)) {
                 ball.bounceOffObject(brick);
                 brick.takeHit();
                 if (brick.isDestroyed()) {
                     score += 10;
-                    // Tạo power-up ngẫu nhiên
                     Random rand = new Random();
-                    // 30%
                     int POWERUP_DROP_CHANCE = 30;
                     if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
-                        if (rand.nextBoolean()) {
+                        int powerUpType = rand.nextInt(3);
+                        if (powerUpType == 0) {
                             powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20));
-                        } else {
+                        } else if (powerUpType == 1) {
                             powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
+                        } else {
+                            powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
                         }
                     }
+                    brickIterator.remove();
                 }
-            }
-        }
-        bricks.removeIf(Brick::isDestroyed);
-
-        // Va chạm giữa paddle và power-up
-        Iterator<PowerUp> powerUpIterator = powerUps.iterator();
-        while (powerUpIterator.hasNext()) {
-            PowerUp pu = powerUpIterator.next();
-            if (pu.checkCollision(paddle)) {
-                if (activePowerUp != null) {
-                    activePowerUp.removeEffect(paddle, ball);
-                }
-                activePowerUp = pu;
-                activePowerUp.applyEffect(paddle, ball);
-                powerUpStartTime = System.currentTimeMillis();
-                powerUpIterator.remove();
             }
         }
     }
@@ -134,16 +158,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private void checkPowerUpDuration() {
         if (activePowerUp != null) {
             if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.duration) {
-                activePowerUp.removeEffect(paddle, ball);
+                if (!balls.isEmpty()) {
+                    activePowerUp.removeEffect(paddle, balls.get(0));
+                }
                 activePowerUp = null;
             }
         }
     }
 
     public void checkGameOver() {
-        if (ball.getY() > GAME_HEIGHT) {
-            gameState = "gameOver";
-        }
         if (bricks.isEmpty()) {
             gameState = "gameWin";
         }
@@ -158,14 +181,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     public void draw(Graphics g) {
         paddle.render(g);
-        ball.render(g);
+        for (Ball ball : balls) {
+            ball.render(g);
+        }
         for (Brick brick : bricks) {
             brick.render(g);
         }
         for (PowerUp pu : powerUps) {
             pu.render(g);
         }
-
         g.setColor(Color.BLACK);
         g.drawString("Score: " + score, 10, 20);
 
@@ -209,6 +233,4 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     @Override
     public void keyTyped(KeyEvent e) {}
-
-
 }

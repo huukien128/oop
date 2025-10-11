@@ -13,7 +13,7 @@ class VeryStrongBrick extends Brick {
         if (!isDestroyed()) {
             int hp = getHitPoints();
             if (hp == 3) g.setColor(Color.RED);
-            else if (hp == 2) g.setColor(Color.ORANGE);
+            else if (hp == 2) g.setColor(new Color(255, 128, 0));
             else g.setColor(Color.YELLOW);
             g.fillRect(getX(), getY(), getWidth(), getHeight());
             g.setColor(Color.BLACK);

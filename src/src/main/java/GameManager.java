@@ -41,11 +41,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 9; j++) {
                 if (i % 3 == 0) {
-                    bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20));
+                    bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20, 1));
                 } else if (i % 3 == 1) {
-                    bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20));
+                    bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 2));
                 } else {
-                    bricks.add(new VeryStrongBrick(j * 80 + 35, i * 30 + 50, 70, 20));
+                    bricks.add(new VeryStrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 3));
                 }
             }
         }
@@ -61,7 +61,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             return;
         }
 
-        // Cập nhật vị trí của paddle
         paddle.update();
 
         // Lặp qua tất cả các quả bóng để cập nhật vị trí và va chạm
@@ -89,7 +88,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         // Kiểm tra điều kiện Game Over: khi không còn quả bóng nào
         if (balls.isEmpty()) {
-            gameState = "gameOver";
+            gameState = "GameOver";
         }
 
         // Cập nhật vị trí và xử lý va chạm của các power-up đang rơi
@@ -98,7 +97,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             PowerUp pu = powerUpIterator.next();
             pu.update();
 
-            // Va chạm giữa paddle và power-up
             if (pu.checkCollision(paddle)) {
                 if (pu instanceof Multiball) {
                     if (!balls.isEmpty()) {
@@ -123,12 +121,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void checkBallCollisions(Ball ball) {
-        // Va chạm giữa bóng và paddle
+
         if (ball.checkCollision(paddle)) {
             ball.bounceOffObject(paddle);
         }
 
-        // Va chạm giữa bóng và các viên gạch
         Iterator<Brick> brickIterator = bricks.iterator();
         while (brickIterator.hasNext()) {
             Brick brick = brickIterator.next();
@@ -142,7 +139,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                     if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
                         int powerUpType = rand.nextInt(3);
                         if (powerUpType == 0) {
-                            powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20));
+                            powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
                         } else if (powerUpType == 1) {
                             powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
                         } else {
@@ -151,6 +148,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                     }
                     brickIterator.remove();
                 }
+                break;
             }
         }
     }

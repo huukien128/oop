@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class Multiball extends PowerUp {
     private List<Ball> balls;
@@ -14,15 +15,22 @@ public class Multiball extends PowerUp {
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        // Tạo các quả bóng mới dựa trên tốc độ của quả bóng ban đầu
-        for (int i = 0; i < numberOfNewBalls; i++) {
-            Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), ball.getSpeed(), 0, 0);
+        Random random = new Random();
+        int baseSpeed = ball.getSpeed();
 
-            // Gán hướng bay ngẫu nhiên cho các quả bóng mới
-            double angle = (Math.random() * 60) + 15; // Góc từ 15 đến 75 độ
-            double sign = (Math.random() > 0.5) ? 1 : -1;
-            newBall.dx = (int) (sign * Math.cos(Math.toRadians(angle)) * newBall.getSpeed());
-            newBall.dy = (int) (-Math.sin(Math.toRadians(angle)) * newBall.getSpeed());
+        for (int i = 0; i < numberOfNewBalls; i++) {
+            // Tạo một quả bóng mới tại vị trí của quả bóng ban đầu
+            Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), baseSpeed, 0, 0);
+
+            // Gán hướng ngẫu nhiên và đảm bảo vận tốc khác 0
+            // dx có thể là -1 hoặc 1.
+            int dx = random.nextBoolean() ? 1 : -1;
+            // dy luôn luôn là -1 để bóng bay lên trên.
+            int dy = -1;
+
+            // setDx và setDy trong lớp Ball cần nhận giá trị int.
+            newBall.setDx(dx);
+            newBall.setDy(dy);
 
             balls.add(newBall);
         }
@@ -30,7 +38,7 @@ public class Multiball extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        // Multiball không cần gỡ bỏ hiệu ứng sau khi hết thời gian
+        // Multiball không cần gỡ bỏ hiệu ứng.
     }
 
     @Override

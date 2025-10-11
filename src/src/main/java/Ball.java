@@ -6,9 +6,20 @@ public class Ball extends MovableObject {
         super(x, y, width, height, speed, dx, dy);
     }
 
-    // Thêm phương thức getter này vào lớp Ball
     public int getSpeed() {
         return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public void setDx( int dx) {
+        this.dx = dx;
+    }
+
+    public void setDy( int dy) {
+        this.dy = dy;
     }
 
     @Override

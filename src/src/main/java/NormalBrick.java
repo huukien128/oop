@@ -1,9 +1,9 @@
 import java.awt.*;
 
 class NormalBrick extends Brick {
-
-    public NormalBrick(int x, int y, int width, int height) {
-        super(x, y, width, height, 1, "Normal");
+    // Sửa hàm khởi tạo để nhận tham số 'hp'
+    public NormalBrick(int x, int y, int width, int height, int hp) {
+        super(x, y, width, height, hp, "Normal");
     }
 
     @Override

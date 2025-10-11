@@ -1,7 +1,7 @@
 import java.awt.*;
 
 class StrongBrick extends Brick {
-    public StrongBrick(int x, int y, int width, int height) {
+    public StrongBrick(int x, int y, int width, int height, int hp) {
         super(x, y, width, height, 2, "Strong");
     }
 

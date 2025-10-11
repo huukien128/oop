@@ -42,10 +42,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         for (int i = 0; i < 5; i++) {
             // Chỉ tạo 9 viên gạch trên mỗi hàng
             for (int j = 0; j < 9; j++) {
-                if (i % 2 == 0) {
+                if (i % 3 == 0) {
                     bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20));
-                } else {
+                } else if (i % 3 == 1) {
                     bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20));
+                } else {
+                    bricks.add(new VeryStrongBrick(j * 80 + 35, i * 30 + 50, 70, 20));
                 }
             }
         }

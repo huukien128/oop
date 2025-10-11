@@ -19,16 +19,11 @@ public class Multiball extends PowerUp {
         int baseSpeed = ball.getSpeed();
 
         for (int i = 0; i < numberOfNewBalls; i++) {
-            // Tạo một quả bóng mới tại vị trí của quả bóng ban đầu
             Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), baseSpeed, 0, 0);
 
-            // Gán hướng ngẫu nhiên và đảm bảo vận tốc khác 0
-            // dx có thể là -1 hoặc 1.
             int dx = random.nextBoolean() ? 1 : -1;
-            // dy luôn luôn là -1 để bóng bay lên trên.
             int dy = -1;
 
-            // setDx và setDy trong lớp Ball cần nhận giá trị int.
             newBall.setDx(dx);
             newBall.setDy(dy);
 

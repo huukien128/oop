@@ -12,7 +12,7 @@ class StrongBrick extends Brick {
     public void render(Graphics g) {
         if (!isDestroyed()) {
             int hp = getHitPoints();
-            if (hp == 2) g.setColor(Color.ORANGE);
+            if (hp == 2) g.setColor(new Color(255, 128, 0));
             else g.setColor(Color.YELLOW);
             g.fillRect(getX(), getY(), getWidth(), getHeight());
             g.setColor(Color.BLACK);

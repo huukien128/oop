@@ -16,6 +16,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private List<Brick> bricks;
     private List<PowerUp> powerUps;
     private int score;
+    private int lives;
     private String gameState;
 
     private PowerUp activePowerUp;
@@ -36,6 +37,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         score = 0;
+        lives = 3;
         gameState = "playing";
 
         for (int i = 0; i < 5; i++) {
@@ -86,9 +88,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             }
         }
 
-        // Kiểm tra điều kiện Game Over: khi không còn quả bóng nào
+        // Di chuyển logic mạng sống ra khỏi vòng lặp
+        // Kiểm tra xem danh sách bóng có rỗng không và cập nhật trạng thái trò chơi
         if (balls.isEmpty()) {
-            gameState = "GameOver";
+            lives--;
+            if (lives > 0) {
+                // Tạo lại bóng mới nếu vẫn còn mạng
+                int BALL_START_SPEED = 2;
+                balls.add(new Ball(GAME_WIDTH / 2,  GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
+            } else {
+                gameState = "gameOver"; // Game Over khi hết mạng
+            }
         }
 
         // Cập nhật vị trí và xử lý va chạm của các power-up đang rơi
@@ -98,19 +108,18 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             pu.update();
 
             if (pu.checkCollision(paddle)) {
-                if (pu instanceof Multiball) {
-                    if (!balls.isEmpty()) {
+                // Thêm kiểm tra !balls.isEmpty() để tránh lỗi
+                if (!balls.isEmpty()) {
+                    if (pu instanceof Multiball) {
                         pu.applyEffect(paddle, balls.get(0));
-                    }
-                } else {
-                    if (activePowerUp != null) {
-                        activePowerUp.removeEffect(paddle, balls.get(0));
-                    }
-                    activePowerUp = pu;
-                    if (!balls.isEmpty()) {
+                    } else {
+                        if (activePowerUp != null) {
+                            activePowerUp.removeEffect(paddle, balls.get(0));
+                        }
+                        activePowerUp = pu;
                         activePowerUp.applyEffect(paddle, balls.get(0));
+                        powerUpStartTime = System.currentTimeMillis();
                     }
-                    powerUpStartTime = System.currentTimeMillis();
                 }
                 powerUpIterator.remove();
             }
@@ -190,6 +199,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
         g.setColor(Color.BLACK);
         g.drawString("Score: " + score, 10, 20);
+        g.setColor(Color.RED);
+        g.drawString("Lives: " + lives, 10, 40);
 
         if (gameState.equals("gameOver")) {
             g.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);

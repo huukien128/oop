@@ -22,6 +22,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private PowerUp activePowerUp;
     private long powerUpStartTime;
 
+    private LevelManager levelManager;
+    private int currentLevel;
+
     public GameManager() {
         initGame();
         setFocusable(true);
@@ -34,23 +37,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         balls = new ArrayList<>();
         int BALL_START_SPEED = 2;
         balls.add(new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 20, 20, BALL_START_SPEED, 1, -1));
-        bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
         gameState = "playing";
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (i % 3 == 0) {
-                    bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20, 1));
-                } else if (i % 3 == 1) {
-                    bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 2));
-                } else {
-                    bricks.add(new VeryStrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 3));
-                }
-            }
-        }
+        // Khởi tạo LevelManager
+        levelManager = new LevelManager(GAME_WIDTH, GAME_HEIGHT);
+        bricks = levelManager.createBricksForCurrentLevel();
     }
 
     public void startGame() {
@@ -175,7 +169,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     public void checkGameOver() {
         if (bricks.isEmpty()) {
-            gameState = "gameWin";
+            levelManager.nextLevel();
+            if (levelManager.getCurrentLevel() > 3) { // Giả sử 3 là level cuối
+                gameState = "gameWin";
+            } else {
+                // Tải level mới và đặt lại trạng thái trò chơi
+                bricks = levelManager.createBricksForCurrentLevel();
+                balls.clear();
+                int BALL_START_SPEED = 2;
+                balls.add(new Ball(GAME_WIDTH / 2,  GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
+            }
         }
     }
 
@@ -201,6 +204,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         g.drawString("Score: " + score, 10, 20);
         g.setColor(Color.RED);
         g.drawString("Lives: " + lives, 10, 40);
+        g.setColor(Color.BLUE);
+        g.drawString("Level: " + levelManager.getCurrentLevel(), 10, 60);
 
         if (gameState.equals("gameOver")) {
             g.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);

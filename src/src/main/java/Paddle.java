@@ -1,26 +1,24 @@
 import java.awt.*;
 
 class Paddle extends MovableObject {
+    private int dx = 0; // Vận tốc di chuyển theo chiều ngang
+
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height, speed, 0, 0);
     }
 
-    public void moveLeft() {
-        x -= speed;
-    }
-
-    public void moveRight() {
-        x += speed;
+    public void setDx(int dx) {
+        this.dx = dx;
     }
 
     @Override
     public void move() {
-        // Di chuyển được điều khiển bằng phím bấm, không cần logic trong hàm này
+        x += dx * speed;
     }
 
     @Override
     public void update() {
-        // Logic cập nhật trạng thái paddle (nếu cần)
+        move();
     }
 
     @Override

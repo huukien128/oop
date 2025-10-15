@@ -29,7 +29,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void initGame() {
-        int PADDLE_SPEED = 100;
+        int PADDLE_SPEED = 5; // Giảm tốc độ để di chuyển mượt mà hơn
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
         int BALL_START_SPEED = 2;
@@ -65,13 +65,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         paddle.update();
 
-        // Lặp qua tất cả các quả bóng để cập nhật vị trí và va chạm
+        if (paddle.getX() < 0) {
+            paddle.x = 0;
+        } else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) {
+            paddle.x = GAME_WIDTH - paddle.getWidth();
+        }
+
         Iterator<Ball> ballIterator = balls.iterator();
         while (ballIterator.hasNext()) {
             Ball ball = ballIterator.next();
             ball.update();
 
-            // Xử lý va chạm với tường (trái, phải và trên cùng)
             if (ball.getX() <= 0 || ball.getX() >= GAME_WIDTH - ball.getWidth()) {
                 ball.dx = -ball.dx;
             }
@@ -79,36 +83,29 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 ball.dy = -ball.dy;
             }
 
-            // Xử lý va chạm bóng với các đối tượng khác
             checkBallCollisions(ball);
 
-            // Kiểm tra xem bóng có rơi khỏi màn hình không
             if (ball.getY() > GAME_HEIGHT) {
                 ballIterator.remove();
             }
         }
 
-        // Di chuyển logic mạng sống ra khỏi vòng lặp
-        // Kiểm tra xem danh sách bóng có rỗng không và cập nhật trạng thái trò chơi
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
-                // Tạo lại bóng mới nếu vẫn còn mạng
                 int BALL_START_SPEED = 2;
-                balls.add(new Ball(GAME_WIDTH / 2,  GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
+                balls.add(new Ball(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
             } else {
-                gameState = "gameOver"; // Game Over khi hết mạng
+                gameState = "gameOver";
             }
         }
 
-        // Cập nhật vị trí và xử lý va chạm của các power-up đang rơi
         Iterator<PowerUp> powerUpIterator = powerUps.iterator();
         while (powerUpIterator.hasNext()) {
             PowerUp pu = powerUpIterator.next();
             pu.update();
 
             if (pu.checkCollision(paddle)) {
-                // Thêm kiểm tra !balls.isEmpty() để tránh lỗi
                 if (!balls.isEmpty()) {
                     if (pu instanceof Multiball) {
                         pu.applyEffect(paddle, balls.get(0));
@@ -130,7 +127,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void checkBallCollisions(Ball ball) {
-
         if (ball.checkCollision(paddle)) {
             ball.bounceOffObject(paddle);
         }
@@ -226,19 +222,20 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_LEFT) {
-            if (paddle.getX() > 0) {
-                paddle.moveLeft();
-            }
+            paddle.setDx(-1); // Đặt vận tốc sang trái
         }
         if (key == KeyEvent.VK_RIGHT) {
-            if (paddle.getX() < GAME_WIDTH - paddle.getWidth()) {
-                paddle.moveRight();
-            }
+            paddle.setDx(1);  // Đặt vận tốc sang phải
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+            paddle.setDx(0);
+        }
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {}

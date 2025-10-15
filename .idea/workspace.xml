@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="committt">
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/GameManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/LevelManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/LevelManager.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +27,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="local_Kien" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -54,7 +57,7 @@
     &quot;Application.gameView.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;local&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;local__Kien&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -89,6 +92,14 @@
       <workItem from="1760260296448" duration="50000" />
       <workItem from="1760315068353" duration="1114000" />
       <workItem from="1760373565202" duration="1336000" />
+      <workItem from="1760376567082" duration="622000" />
+      <workItem from="1760377212430" duration="150000" />
+      <workItem from="1760432231927" duration="125000" />
+      <workItem from="1760448807265" duration="47000" />
+      <workItem from="1760488793343" duration="221000" />
+      <workItem from="1760489044725" duration="26000" />
+      <workItem from="1760494843113" duration="872000" />
+      <workItem from="1760497047192" duration="3874000" />
     </task>
     <task id="LOCAL-00001" summary="committt">
       <option name="closed" value="true" />

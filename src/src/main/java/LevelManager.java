@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LevelManager {
 
@@ -10,63 +13,79 @@ public class LevelManager {
     public LevelManager(int gameWidth, int gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-        this.currentLevel = 1; // Bắt đầu từ level 1
+        this.currentLevel = 1;
     }
 
     public List<Brick> createBricksForCurrentLevel() {
         List<Brick> bricks = new ArrayList<>();
-        switch (currentLevel) {
-            case 1:
-                createLevel1(bricks);
-                break;
-            case 2:
-                createLevel2(bricks);
-                break;
-            case 3:
-                createLevel3(bricks);
-                break;
-            default:
-                // Mặc định hoặc level cuối cùng
-                break;
+        List<String> levelMap = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/map/map.txt")))) {
+            String line;
+            boolean foundLevel = false;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().equals("LEVEL" + currentLevel)) {
+                    foundLevel = true;
+                    continue;
+                }
+
+                if (foundLevel && line.trim().startsWith("LEVEL")) {
+                    break;
+                }
+
+                if (foundLevel && !line.trim().isEmpty()) {
+                    levelMap.add(line.trim());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return bricks;
+        }
+
+        if (levelMap.isEmpty()) {
+            return bricks;
+        }
+
+        int maxCols = 0;
+        for (String row : levelMap) {
+            if (row.length() > maxCols) {
+                maxCols = row.length();
+            }
+        }
+
+        // Tăng giá trị padding để tạo lề lớn hơn
+        int padding = 20;
+        int spacing = 5;
+
+        int availableWidth = gameWidth - (2 * padding) - ((maxCols - 1) * spacing);
+        int brickWidth = availableWidth / maxCols;
+        int brickHeight = 20;
+        int rowCount = 0;
+
+        for (String row : levelMap) {
+            int colCount = 0;
+            for (char brickType : row.toCharArray()) {
+                int brickX = padding + colCount * (brickWidth + spacing);
+                int brickY = 50 + rowCount * (brickHeight + spacing);
+
+                switch (brickType) {
+                    case '1':
+                        bricks.add(new NormalBrick(brickX, brickY, brickWidth, brickHeight, 1));
+                        break;
+                    case '2':
+                        bricks.add(new StrongBrick(brickX, brickY, brickWidth, brickHeight, 2));
+                        break;
+                    case '3':
+                        bricks.add(new VeryStrongBrick(brickX, brickY, brickWidth, brickHeight, 3));
+                        break;
+                    case ' ':
+                        break;
+                }
+                colCount++;
+            }
+            rowCount++;
         }
         return bricks;
-    }
-
-    private void createLevel1(List<Brick> bricks) {
-        // Level 1: Dễ, nhiều gạch thường
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 9; j++) {
-                bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20, 1));
-            }
-        }
-    }
-
-    private void createLevel2(List<Brick> bricks) {
-        // Level 2: Khó hơn, thêm gạch mạnh
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (i % 2 == 0) {
-                    bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20, 1));
-                } else {
-                    bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 2));
-                }
-            }
-        }
-    }
-
-    private void createLevel3(List<Brick> bricks) {
-        // Level 3: Khó nhất, gạch rất mạnh và bố cục phức tạp hơn
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (i % 3 == 0) {
-                    bricks.add(new VeryStrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 3));
-                } else if (i % 3 == 1) {
-                    bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 2));
-                } else {
-                    bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20, 1));
-                }
-            }
-        }
     }
 
     public void nextLevel() {

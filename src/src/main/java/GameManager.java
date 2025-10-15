@@ -30,24 +30,33 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     private void initGame() {
         int PADDLE_SPEED = 5;
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 100, 25, PADDLE_SPEED);
         balls = new ArrayList<>();
         int BALL_START_SPEED = 2;
-        balls.add(new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 20, 20, BALL_START_SPEED, 1, -1));
+        balls.add(new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 15, 15, BALL_START_SPEED, 1, -1));
         bricks = new ArrayList<>();
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
         gameState = "playing";
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (i % 3 == 0) {
-                    bricks.add(new NormalBrick(j * 80 + 35, i * 30 + 50, 70, 20, 1));
-                } else if (i % 3 == 1) {
-                    bricks.add(new StrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 2));
+        int brickWidth = 45;
+        int brickHeight = 15;
+        int brickRows = 7;
+        int bricksPerRow = 12;
+        int startX = (GAME_WIDTH - (bricksPerRow * brickWidth)) / 2 - 40;
+
+        for (int i = 0; i < brickRows; i++) {
+            for (int j = 0; j < bricksPerRow; j++) {
+                int currentX = startX + j * (brickWidth + 5);
+                int currentY = 100 + i * (brickHeight + 5);
+
+                if (i < 2) {
+                    bricks.add(new VeryStrongBrick(currentX, currentY, brickWidth, brickHeight, 3));
+                } else if (i < 4) {
+                    bricks.add(new StrongBrick(currentX, currentY, brickWidth, brickHeight, 2));
                 } else {
-                    bricks.add(new VeryStrongBrick(j * 80 + 35, i * 30 + 50, 70, 20, 3));
+                    bricks.add(new NormalBrick(currentX, currentY, brickWidth, brickHeight, 1));
                 }
             }
         }
@@ -94,7 +103,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             lives--;
             if (lives > 0) {
                 int BALL_START_SPEED = 2;
-                balls.add(new Ball(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
+                balls.add(new Ball(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 230, 15, 15, BALL_START_SPEED, 1, -1));
             } else {
                 gameState = "gameOver";
             }

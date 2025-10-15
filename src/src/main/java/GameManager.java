@@ -29,7 +29,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void initGame() {
-        int PADDLE_SPEED = 5; // Giảm tốc độ để di chuyển mượt mà hơn
+        int PADDLE_SPEED = 5;
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
         int BALL_START_SPEED = 2;
@@ -109,6 +109,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 if (!balls.isEmpty()) {
                     if (pu instanceof Multiball) {
                         pu.applyEffect(paddle, balls.get(0));
+                    } else if (pu instanceof LifeUpPowerUp) { // Thêm logic xử lý LifeUpPowerUp
+                        lives++;
                     } else {
                         if (activePowerUp != null) {
                             activePowerUp.removeEffect(paddle, balls.get(0));
@@ -142,13 +144,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                     Random rand = new Random();
                     int POWERUP_DROP_CHANCE = 30;
                     if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
-                        int powerUpType = rand.nextInt(3);
+                        int powerUpType = rand.nextInt(4); // Tăng số lượng loại power-up
                         if (powerUpType == 0) {
                             powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
                         } else if (powerUpType == 1) {
                             powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
-                        } else {
+                        } else if (powerUpType == 2) {
                             powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
+                        } else { // powerUpType == 3
+                            powerUps.add(new LifeUpPowerUp(brick.getX(), brick.getY(), 20, 20));
                         }
                     }
                     brickIterator.remove();
@@ -222,10 +226,10 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_LEFT) {
-            paddle.setDx(-1); // Đặt vận tốc sang trái
+            paddle.setDx(-1);
         }
         if (key == KeyEvent.VK_RIGHT) {
-            paddle.setDx(1);  // Đặt vận tốc sang phải
+            paddle.setDx(1);
         }
     }
 

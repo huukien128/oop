@@ -5,15 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/LifeUpPowerUp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/Paddle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Paddle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/GameManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/Paddle.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/Paddle.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">

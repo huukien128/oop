@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="committt">
+    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="sửa lại level bằng cách load file map.txt">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/GameManager.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/LevelManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/LevelManager.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -99,7 +96,7 @@
       <workItem from="1760488793343" duration="221000" />
       <workItem from="1760489044725" duration="26000" />
       <workItem from="1760494843113" duration="872000" />
-      <workItem from="1760497047192" duration="3874000" />
+      <workItem from="1760497047192" duration="7300000" />
     </task>
     <task id="LOCAL-00001" summary="committt">
       <option name="closed" value="true" />
@@ -109,7 +106,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760245574409</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="sửa lại level bằng cách load file map.txt">
+      <option name="closed" value="true" />
+      <created>1760501335791</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1760501335791</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,7 +144,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Merge branch 'master' into local" />
     <MESSAGE value="committt" />
-    <option name="LAST_COMMIT_MESSAGE" value="committt" />
+    <MESSAGE value="sửa lại level bằng cách load file map.txt" />
+    <option name="LAST_COMMIT_MESSAGE" value="sửa lại level bằng cách load file map.txt" />
   </component>
 </project>

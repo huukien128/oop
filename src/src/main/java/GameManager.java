@@ -36,7 +36,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
         int BALL_START_SPEED = 2;
-        balls.add(new Ball(GAME_WIDTH / 2 - 7, GAME_HEIGHT / 2 - 7, 20, 20, BALL_START_SPEED, 1, -1));
+        balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
@@ -82,16 +82,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             }
         }
 
-        // Di chuyển logic mạng sống ra khỏi vòng lặp
-        // Kiểm tra xem danh sách bóng có rỗng không và cập nhật trạng thái trò chơi
+
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
-                // Tạo lại bóng mới nếu vẫn còn mạng
                 int BALL_START_SPEED = 2;
-                balls.add(new Ball(GAME_WIDTH / 2,  GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
+                // Tạo quả bóng mới ở vị trí ban đầu trên thanh đỡ
+                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
             } else {
-                gameState = "gameOver"; // Game Over khi hết mạng
+                gameState = "gameOver";
             }
         }
 
@@ -170,14 +169,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     public void checkGameOver() {
         if (bricks.isEmpty()) {
             levelManager.nextLevel();
-            if (levelManager.getCurrentLevel() > 3) { // Giả sử 3 là level cuối
+            // Lấy danh sách gạch của cấp độ tiếp theo
+            bricks = levelManager.createBricksForCurrentLevel();
+            if (bricks.isEmpty()) {
+                // Nếu không có gạch nào được tạo cho level tiếp theo, người chơi đã thắng
                 gameState = "gameWin";
             } else {
                 // Tải level mới và đặt lại trạng thái trò chơi
-                bricks = levelManager.createBricksForCurrentLevel();
                 balls.clear();
                 int BALL_START_SPEED = 2;
-                balls.add(new Ball(GAME_WIDTH / 2,  GAME_HEIGHT / 2 + 230, 20, 20, BALL_START_SPEED, 1, -1));
+                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
             }
         }
     }

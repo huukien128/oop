@@ -4,6 +4,7 @@ class Paddle extends MovableObject {
     private final int defaultWidth;
     private boolean isLaserReady = false;
     private long laserActivationTime = 0;
+    private int dx = 0;
 
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height, speed, 0, 0);
@@ -26,20 +27,23 @@ class Paddle extends MovableObject {
     public boolean isLaserReady() { return isLaserReady; }
     public long getLaserActivationTime() { return laserActivationTime; }
 
-    public void moveLeft() {
-        x -= speed;
+    // Phương thức mới để đặt vận tốc
+    public void setDx(int dx) {
+        this.dx = dx;
     }
 
-    public void moveRight() {
-        x += speed;
-    }
+    // Xóa moveLeft() và moveRight() cũ vì chúng ta dùng update()
 
     @Override
     public void move() {
+        // Áp dụng vận tốc cho vị trí
+        x += dx * speed;
     }
 
     @Override
     public void update() {
+        // Cập nhật vị trí trong mỗi khung hình dựa trên vận tốc đã đặt
+        move();
     }
 
     @Override

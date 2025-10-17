@@ -30,7 +30,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     private LevelManager levelManager;
 
-    private final int PADDLE_SPEED = 53;
+    private final int PADDLE_SPEED = 20;
     private final int BALL_START_SPEED = 2;
     private final int POWERUP_DROP_CHANCE = 30;
 
@@ -42,7 +42,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void initGame() {
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 140, 25, PADDLE_SPEED);
         balls = new ArrayList<>();
         balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
         powerUps = new ArrayList<>();
@@ -65,6 +65,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
 
         paddle.update();
+        if (paddle.x < 0) {
+            paddle.x = 0;
+        }
+        else if (paddle.x + paddle.getWidth() > GAME_WIDTH) {
+            paddle.x = GAME_WIDTH - paddle.getWidth();
+        }
 
         handleLaserShot();
 
@@ -279,22 +285,24 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (gameState.equals("playing")) {
-            if (key == KeyEvent.VK_LEFT) {
-                if (paddle.getX() > 0) {
-                    paddle.moveLeft();
-                }
-            }
-            if (key == KeyEvent.VK_RIGHT) {
-                if (paddle.getX() < GAME_WIDTH - paddle.getWidth()) {
-                    paddle.moveRight();
-                }
-            }
+        if (key == KeyEvent.VK_LEFT) {
+            // Thay vì moveLeft(), đặt vận tốc sang trái
+            paddle.setDx(-1);
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            // Thay vì moveRight(), đặt vận tốc sang phải
+            paddle.setDx(1);
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        // Khi nhả phím, vận tốc phải bằng 0
+        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+            paddle.setDx(0);
+        }
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {}

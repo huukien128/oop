@@ -1,9 +1,30 @@
 import java.awt.*;
 
 class Paddle extends MovableObject {
+    private final int defaultWidth;
+    private boolean isLaserReady = false;
+    private long laserActivationTime = 0;
+
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height, speed, 0, 0);
+        this.defaultWidth = width;
     }
+
+    public int getDefaultWidth() {
+        return defaultWidth;
+    }
+
+    public void setActiveLaser(boolean active) {
+        this.isLaserReady = active;
+        if (active) {
+            this.laserActivationTime = System.currentTimeMillis();
+        } else {
+            this.laserActivationTime = 0;
+        }
+    }
+
+    public boolean isLaserReady() { return isLaserReady; }
+    public long getLaserActivationTime() { return laserActivationTime; }
 
     public void moveLeft() {
         x -= speed;
@@ -15,12 +36,10 @@ class Paddle extends MovableObject {
 
     @Override
     public void move() {
-        // Di chuyển được điều khiển bằng phím bấm, không cần logic trong hàm này
     }
 
     @Override
     public void update() {
-        // Logic cập nhật trạng thái paddle (nếu cần)
     }
 
     @Override

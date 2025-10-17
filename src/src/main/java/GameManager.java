@@ -10,6 +10,10 @@ import java.util.Random;
 public class GameManager extends JPanel implements KeyListener, Runnable {
     protected static final int GAME_WIDTH = 800;
     protected static final int GAME_HEIGHT = 600;
+    private static final int DELAY = 10;
+
+    private final int LASER_SHOT_DELAY = 1000;
+    private final int LASER_WIDTH = 20;
 
     private Paddle paddle;
     private List<Ball> balls;
@@ -19,30 +23,33 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private int lives;
     private String gameState;
 
+    private LaserBeam laserBeam = null;
+
     private PowerUp activePowerUp;
     private long powerUpStartTime;
 
     private LevelManager levelManager;
-    private int currentLevel;
+
+    private final int PADDLE_SPEED = 53;
+    private final int BALL_START_SPEED = 2;
+    private final int POWERUP_DROP_CHANCE = 30;
 
     public GameManager() {
         initGame();
         setFocusable(true);
         addKeyListener(this);
+        setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
     }
 
     private void initGame() {
-        int PADDLE_SPEED = 100;
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 150, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
-        int BALL_START_SPEED = 2;
         balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
         gameState = "playing";
 
-        // Khởi tạo LevelManager
         levelManager = new LevelManager(GAME_WIDTH, GAME_HEIGHT);
         bricks = levelManager.createBricksForCurrentLevel();
     }
@@ -59,51 +66,48 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         paddle.update();
 
-        // Lặp qua tất cả các quả bóng để cập nhật vị trí và va chạm
+        handleLaserShot();
+
         Iterator<Ball> ballIterator = balls.iterator();
         while (ballIterator.hasNext()) {
             Ball ball = ballIterator.next();
             ball.update();
 
-            // Xử lý va chạm với tường (trái, phải và trên cùng)
             if (ball.getX() <= 0 || ball.getX() >= GAME_WIDTH - ball.getWidth()) {
-                ball.dx = -ball.dx;
+                ball.setDx(-ball.getDx());
             }
             if (ball.getY() <= 0) {
-                ball.dy = -ball.dy;
+                ball.setDy(-ball.getDy());
             }
 
-            // Xử lý va chạm bóng với các đối tượng khác
             checkBallCollisions(ball);
 
-            // Kiểm tra xem bóng có rơi khỏi màn hình không
             if (ball.getY() > GAME_HEIGHT) {
                 ballIterator.remove();
             }
         }
 
-
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
-                int BALL_START_SPEED = 2;
-                // Tạo quả bóng mới ở vị trí ban đầu trên thanh đỡ
                 balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
+                paddle.setActiveLaser(false);
+                laserBeam = null;
             } else {
                 gameState = "gameOver";
             }
         }
 
-        // Cập nhật vị trí và xử lý va chạm của các power-up đang rơi
         Iterator<PowerUp> powerUpIterator = powerUps.iterator();
         while (powerUpIterator.hasNext()) {
             PowerUp pu = powerUpIterator.next();
             pu.update();
 
             if (pu.checkCollision(paddle)) {
-                // Thêm kiểm tra !balls.isEmpty() để tránh lỗi
                 if (!balls.isEmpty()) {
                     if (pu instanceof Multiball) {
+                        pu.applyEffect(paddle, balls.get(0));
+                    } else if (pu instanceof LaserPowerUp) {
                         pu.applyEffect(paddle, balls.get(0));
                     } else {
                         if (activePowerUp != null) {
@@ -122,10 +126,41 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         checkGameOver();
     }
 
+    private void handleLaserShot() {
+        if (paddle.isLaserReady() && laserBeam == null) {
+            if (System.currentTimeMillis() - paddle.getLaserActivationTime() >= LASER_SHOT_DELAY) {
+                int laserX = paddle.getX() + paddle.getWidth() / 2 - LASER_WIDTH / 2;
+                int laserHeight = paddle.getY();
+                laserBeam = new LaserBeam(laserX, 0, LASER_WIDTH, laserHeight);
+                paddle.setActiveLaser(false);
+            }
+        }
+
+        if (laserBeam != null) {
+            if (laserBeam.isExpired()) {
+                laserBeam = null;
+            }
+        }
+    }
+
     private void checkBallCollisions(Ball ball) {
 
         if (ball.checkCollision(paddle)) {
             ball.bounceOffObject(paddle);
+        }
+
+        if (laserBeam != null) {
+            Iterator<Brick> laserBrickIterator = bricks.iterator();
+            while (laserBrickIterator.hasNext()) {
+                Brick brick = laserBrickIterator.next();
+                if (!brick.isDestroyed() && laserBeam.checkCollision(brick)) {
+                    while (!brick.isDestroyed()) {
+                        brick.takeHit();
+                    }
+                    score += 10;
+                }
+            }
+            bricks.removeIf(Brick::isDestroyed);
         }
 
         Iterator<Brick> brickIterator = bricks.iterator();
@@ -137,15 +172,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 if (brick.isDestroyed()) {
                     score += 10;
                     Random rand = new Random();
-                    int POWERUP_DROP_CHANCE = 30;
                     if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
-                        int powerUpType = rand.nextInt(3);
+                        int powerUpType = rand.nextInt(4);
                         if (powerUpType == 0) {
                             powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
                         } else if (powerUpType == 1) {
                             powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
-                        } else {
+                        } else if (powerUpType == 2) {
                             powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
+                        } else {
+                            powerUps.add(new LaserPowerUp(brick.getX(), brick.getY(), 20, 20));
                         }
                     }
                     brickIterator.remove();
@@ -157,11 +193,13 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     private void checkPowerUpDuration() {
         if (activePowerUp != null) {
-            if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.duration) {
-                if (!balls.isEmpty()) {
-                    activePowerUp.removeEffect(paddle, balls.get(0));
+            if (!(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
+                if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.duration) {
+                    if (!balls.isEmpty()) {
+                        activePowerUp.removeEffect(paddle, balls.get(0));
+                    }
+                    activePowerUp = null;
                 }
-                activePowerUp = null;
             }
         }
     }
@@ -169,16 +207,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     public void checkGameOver() {
         if (bricks.isEmpty()) {
             levelManager.nextLevel();
-            // Lấy danh sách gạch của cấp độ tiếp theo
             bricks = levelManager.createBricksForCurrentLevel();
             if (bricks.isEmpty()) {
-                // Nếu không có gạch nào được tạo cho level tiếp theo, người chơi đã thắng
                 gameState = "gameWin";
             } else {
-                // Tải level mới và đặt lại trạng thái trò chơi
                 balls.clear();
-                int BALL_START_SPEED = 2;
                 balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
+                paddle.setActiveLaser(false);
+                laserBeam = null;
             }
         }
     }
@@ -191,6 +227,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     public void draw(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
         paddle.render(g);
         for (Ball ball : balls) {
             ball.render(g);
@@ -201,12 +240,21 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         for (PowerUp pu : powerUps) {
             pu.render(g);
         }
+
+        if (laserBeam != null) {
+            laserBeam.render(g);
+        }
+
         g.setColor(Color.BLACK);
         g.drawString("Score: " + score, 10, 20);
         g.setColor(Color.RED);
         g.drawString("Lives: " + lives, 10, 40);
         g.setColor(Color.BLUE);
         g.drawString("Level: " + levelManager.getCurrentLevel(), 10, 60);
+
+        String puStatus = activePowerUp != null ? activePowerUp.getType() :
+                (paddle.isLaserReady() ? "Laser Pending" : "None");
+        g.drawString("PowerUp Active: " + puStatus, 10, 80);
 
         if (gameState.equals("gameOver")) {
             g.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);
@@ -221,7 +269,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             updateGame();
             repaint();
             try {
-                Thread.sleep(10);
+                Thread.sleep(DELAY);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -231,14 +279,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT) {
-            if (paddle.getX() > 0) {
-                paddle.moveLeft();
+        if (gameState.equals("playing")) {
+            if (key == KeyEvent.VK_LEFT) {
+                if (paddle.getX() > 0) {
+                    paddle.moveLeft();
+                }
             }
-        }
-        if (key == KeyEvent.VK_RIGHT) {
-            if (paddle.getX() < GAME_WIDTH - paddle.getWidth()) {
-                paddle.moveRight();
+            if (key == KeyEvent.VK_RIGHT) {
+                if (paddle.getX() < GAME_WIDTH - paddle.getWidth()) {
+                    paddle.moveRight();
+                }
             }
         }
     }
@@ -248,4 +298,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     @Override
     public void keyTyped(KeyEvent e) {}
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("OOP Arkanoid Game - Project");
+        GameManager gameManager = new GameManager();
+
+        frame.add(gameManager);
+        frame.setSize(GAME_WIDTH, GAME_HEIGHT + 35);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setResizable(false);
+
+        gameManager.startGame();
+    }
 }

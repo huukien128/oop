@@ -1,4 +1,8 @@
 import java.awt.*;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
 
 class Paddle extends MovableObject {
     private final int defaultWidth;
@@ -6,9 +10,18 @@ class Paddle extends MovableObject {
     private long laserActivationTime = 0;
     private int dx = 0;
 
+    private BufferedImage paddleImage;
+
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height, speed, 0, 0);
         this.defaultWidth = width;
+
+        try {
+            paddleImage = ImageIO.read(new File("C:/Users/admin/oop/assets/images/paddle.png"));
+        } catch (IOException e) {
+            System.err.println("Lỗi tải ảnh paddle: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public int getDefaultWidth() {
@@ -48,7 +61,11 @@ class Paddle extends MovableObject {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(x, y, width, height);
+        if (paddleImage != null) {
+            g.drawImage(paddleImage, x, y, width, height, null);
+        } else {
+            g.setColor(Color.WHITE);
+            g.fillRect(x, y, width, height);
+        }
     }
 }

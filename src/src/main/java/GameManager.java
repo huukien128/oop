@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.io.File;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
 
 public class GameManager extends JPanel implements KeyListener, Runnable {
     protected static final int GAME_WIDTH = 800;
@@ -29,12 +33,20 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private long powerUpStartTime;
 
     private LevelManager levelManager;
+    private BufferedImage backgroundImage;
 
-    private final int PADDLE_SPEED = 20;
+    private final int PADDLE_SPEED = 10;
     private final int BALL_START_SPEED = 2;
     private final int POWERUP_DROP_CHANCE = 30;
 
     public GameManager() {
+        try {
+            backgroundImage = ImageIO.read(new File("C:/Users/admin/oop/assets/images/background.png"));
+        } catch (IOException e) {
+            System.err.println("Lỗi tải ảnh background: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         initGame();
         setFocusable(true);
         addKeyListener(this);
@@ -42,9 +54,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void initGame() {
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 140, 25, PADDLE_SPEED);
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 140, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
-        balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
+        balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
@@ -96,7 +108,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
-                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
+                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
                 paddle.setActiveLaser(false);
                 laserBeam = null;
             } else {
@@ -233,10 +245,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        }
 
         paddle.render(g);
+
         for (Ball ball : balls) {
             ball.render(g);
         }

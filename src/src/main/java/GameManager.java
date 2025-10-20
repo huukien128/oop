@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,12 +41,19 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private final int POWERUP_DROP_CHANCE = 30;
 
     public GameManager() {
-        try {
-            backgroundImage = ImageIO.read(new File("C:/Users/admin/oop/assets/images/background.png"));
+        try (InputStream is = getClass().getResourceAsStream("/images/background.png")) {
+            if (is != null) {
+                backgroundImage = ImageIO.read(is);
+                System.out.println("Tải ảnh background thành công");
+            } else {
+                System.err.println("Lỗi: Không tìm thấy tệp /images/background.png trong classpath.");
+            }
         } catch (IOException e) {
             System.err.println("Lỗi tải ảnh background: " + e.getMessage());
             e.printStackTrace();
         }
+
+
 
         initGame();
         setFocusable(true);
@@ -324,16 +332,5 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyTyped(KeyEvent e) {}
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("OOP Arkanoid Game - Project");
-        GameManager gameManager = new GameManager();
 
-        frame.add(gameManager);
-        frame.setSize(GAME_WIDTH, GAME_HEIGHT + 35);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setResizable(false);
-
-        gameManager.startGame();
-    }
 }

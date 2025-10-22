@@ -19,6 +19,6 @@ class LaserBeam extends GameObject {
     @Override
     public void render(Graphics g) {
         g.setColor(Color.RED.brighter());
-        g.fillRect(x, y, width, height);
+        g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
 }

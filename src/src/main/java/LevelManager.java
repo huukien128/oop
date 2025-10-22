@@ -26,7 +26,6 @@ public class LevelManager {
             boolean foundLevel = false;
 
             while ((line = br.readLine()) != null) {
-                // bỏ dòng trống nhưng KHÔNG trim dòng bản đồ
                 if (line.trim().isEmpty()) continue;
 
                 if (line.trim().equals("LEVEL" + currentLevel)) {
@@ -39,7 +38,6 @@ public class LevelManager {
                 }
 
                 if (foundLevel) {
-                    // Giữ nguyên dòng để bảo toàn khoảng trắng đầu dòng
                     levelMap.add(line);
                 }
             }
@@ -55,18 +53,15 @@ public class LevelManager {
         int brickWidth = 50;
         int brickHeight = 20;
 
-        // Tính số cột lớn nhất
         int maxCols = 0;
         for (String row : levelMap) {
             if (row.length() > maxCols) maxCols = row.length();
         }
 
-        // Căn giữa bản đồ
         int totalMapWidth = maxCols * (brickWidth + spacing) - spacing;
         int startX = (gameWidth - totalMapWidth) / 2;
         int startY = 60;
 
-        // Duyệt từng dòng và ký tự
         for (int row = 0; row < levelMap.size(); row++) {
             String rowStr = levelMap.get(row);
 

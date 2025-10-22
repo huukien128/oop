@@ -20,8 +20,7 @@ public class FastBallPowerUp extends PowerUp {
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
         for (Ball currentBall : balls) {
-            // Chỉ giảm tốc độ nếu nó đã được tăng lên
-            if (currentBall.getSpeed() > 2) { // Giả định tốc độ ban đầu là 2
+            if (currentBall.getSpeed() > 2) {
                 currentBall.setSpeed(currentBall.getSpeed() - BOOST_AMOUNT);
             }
         }
@@ -30,8 +29,8 @@ public class FastBallPowerUp extends PowerUp {
     @Override
     public void render(Graphics g) {
         g.setColor(Color.ORANGE);
-        g.fillOval(x, y, width, height);
+        g.fillOval(getX(), getY(), getWidth(), getHeight());
         g.setColor(Color.BLACK);
-        g.drawString("F", x + 5, y + 15);
+        g.drawString("F", getX() + 5, getY() + 15);
     }
 }

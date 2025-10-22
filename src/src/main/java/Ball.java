@@ -7,38 +7,38 @@ public class Ball extends MovableObject {
     }
 
     public int getSpeed() {
-        return speed;
+        return super.getSpeed();
     }
 
     public void setSpeed(int speed) {
-        this.speed = speed;
+        super.setSpeed(speed);
     }
 
     public void setDx( int dx) {
-        this.dx = dx;
+        super.setDx(dx);
     }
 
     public void setDy( int dy) {
-        this.dy = dy;
+        super.setDy(dy);
     }
 
     @Override
     public void move() {
-        x += dx * speed;
-        y += dy * speed;
+        setX(getX() + getDx() * getSpeed());
+        setY(getY() + getDy() * getSpeed());
     }
 
 
     public void bounceOffObject(GameObject obj) {
-        Rectangle ballRect = new Rectangle(x, y, width, height);
+        Rectangle ballRect = new Rectangle(getX(), getY(), getWidth(), getHeight());
         Rectangle objRect = new Rectangle(obj.getX(), obj.getY(), obj.getWidth(), obj.getHeight());
 
         if (ballRect.intersects(objRect)) {
             Rectangle intersection = ballRect.intersection(objRect);
             if (intersection.width > intersection.height) {
-                dy = -dy;
+                setDy(-getDy());
             } else {
-                dx = -dx;
+                setDx(-getDx());
             }
         }
     }
@@ -51,6 +51,6 @@ public class Ball extends MovableObject {
     @Override
     public void render(Graphics g) {
         g.setColor(Color.RED);
-        g.fillOval(x, y, width, height);
+        g.fillOval(getX(), getY(), getWidth(), getHeight());
     }
 }

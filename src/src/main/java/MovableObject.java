@@ -1,7 +1,7 @@
 public abstract class MovableObject extends GameObject {
-    protected int dx;
-    protected int dy;
-    protected int speed;
+    private int dx;
+    private int dy;
+    private int speed;
 
     public MovableObject(int x, int y, int width, int height, int speed, int dx, int dy) {
         super(x, y, width, height);
@@ -19,5 +19,21 @@ public abstract class MovableObject extends GameObject {
 
     public int getDy() {
         return dy;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setDx(int dx) {
+        this.dx = dx;
+    }
+
+    public void setDy(int dy) {
+        this.dy = dy;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 }

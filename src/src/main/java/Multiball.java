@@ -33,14 +33,14 @@ public class Multiball extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        // Multiball không cần gỡ bỏ hiệu ứng.
+        // Không cần gỡ bỏ hiệu ứng.
     }
 
     @Override
     public void render(Graphics g) {
         g.setColor(Color.CYAN);
-        g.fillOval(x, y, width, height);
+        g.fillOval(getX(), getY(), getWidth(), getHeight());
         g.setColor(Color.WHITE);
-        g.drawString(String.valueOf(numberOfNewBalls), x + width / 4, y + height / 2 + 5);
+        g.drawString(String.valueOf(numberOfNewBalls), getX() + getWidth() / 4, getY() + getHeight() / 2 + 5);
     }
 }

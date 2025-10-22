@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="sửa thanh paddle">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/Paddle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Paddle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/GameManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/Paddle.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/Paddle.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/map/map.txt" afterDir="false" />
-    </list>
+    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="Merge remote-tracking branch 'origin/local_Kien' into local_Kien&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;src/src/main/java/GameManager.java&#10;#&#9;src/target/classes/GameManager.class&#10;#&#9;src/target/classes/Paddle.class" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,9 +35,12 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/huukien128/oop.git&quot;,
-    &quot;accountId&quot;: &quot;5dd35dc4-1c6e-455c-a347-786dbb5528bf&quot;
+    &quot;accountId&quot;: &quot;af8e37b5-2afa-412b-9bf6-4c3afacc3d16&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -62,7 +57,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;quang&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;local__Kien&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -150,7 +145,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/master" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
@@ -168,16 +163,5 @@
     <MESSAGE value="sửa lại level bằng cách load file map.txt" />
     <MESSAGE value="sửa thanh paddle" />
     <option name="LAST_COMMIT_MESSAGE" value="sửa thanh paddle" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/src/main/java/Ball.java</url>
-          <line>2</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -1,4 +1,5 @@
-abstract class Brick extends GameObject {
+
+public abstract class Brick extends GameObject {
     private int hitPoints;
     private String type;
 
@@ -18,5 +19,9 @@ abstract class Brick extends GameObject {
 
     public boolean isDestroyed() {
         return hitPoints <= 0;
+    }
+
+    public String getType() {
+        return type;
     }
 }

@@ -77,11 +77,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
 
         paddle.update();
-        if (paddle.x < 0) {
-            paddle.x = 0;
+        if (paddle.getX() < 0) {
+            paddle.setX(0);
         }
-        else if (paddle.x + paddle.getWidth() > GAME_WIDTH) {
-            paddle.x = GAME_WIDTH - paddle.getWidth();
+        else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) {
+            paddle.setX(GAME_WIDTH - paddle.getWidth());
         }
 
         handleLaserShot();
@@ -212,7 +212,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private void checkPowerUpDuration() {
         if (activePowerUp != null) {
             if (!(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
-                if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.duration) {
+                if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.getDuration()) {
                     if (!balls.isEmpty()) {
                         activePowerUp.removeEffect(paddle, balls.get(0));
                     }
@@ -303,11 +303,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_LEFT) {
-            // Thay vì moveLeft(), đặt vận tốc sang trái
             paddle.setDx(-1);
         }
         if (key == KeyEvent.VK_RIGHT) {
-            // Thay vì moveRight(), đặt vận tốc sang phải
             paddle.setDx(1);
         }
     }
@@ -315,7 +313,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        // Khi nhả phím, vận tốc phải bằng 0
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
             paddle.setDx(0);
         }
@@ -323,17 +320,4 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     @Override
     public void keyTyped(KeyEvent e) {}
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("OOP Arkanoid Game - Project");
-        GameManager gameManager = new GameManager();
-
-        frame.add(gameManager);
-        frame.setSize(GAME_WIDTH, GAME_HEIGHT + 35);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setResizable(false);
-
-        gameManager.startGame();
-    }
 }

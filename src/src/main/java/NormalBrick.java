@@ -1,7 +1,6 @@
 import java.awt.*;
 
-class NormalBrick extends Brick {
-    // Sửa hàm khởi tạo để nhận tham số 'hp'
+public class NormalBrick extends Brick {
     public NormalBrick(int x, int y, int width, int height, int hp) {
         super(x, y, width, height, hp, "Normal");
     }

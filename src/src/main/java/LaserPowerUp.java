@@ -16,10 +16,9 @@ class LaserPowerUp extends PowerUp {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(new Color(255, 165, 0)); // Màu cam
-        g.fillOval(x, y, width, height);
+        g.setColor(new Color(255, 165, 0));
+        g.fillOval(getX(), getY(), getWidth(), getHeight());
         g.setColor(Color.WHITE);
-        g.drawString("L", x + 5, y + 15);
+        g.drawString("L", getX() + 5, getY() + 15);
     }
 }
-

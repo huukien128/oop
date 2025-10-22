@@ -9,21 +9,21 @@ public class ExpandPaddlePowerUp extends PowerUp {
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        paddle.width += EXPAND_AMOUNT;
-        paddle.x -= EXPAND_AMOUNT / 2;
+        paddle.setWidth(paddle.getWidth() + EXPAND_AMOUNT);
+        paddle.setX(paddle.getX() - EXPAND_AMOUNT / 2);
     }
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        paddle.width -= EXPAND_AMOUNT;
-        paddle.x += EXPAND_AMOUNT / 2;
+        paddle.setWidth(paddle.getWidth() - EXPAND_AMOUNT);
+        paddle.setX(paddle.getX() + EXPAND_AMOUNT / 2);
     }
 
     @Override
     public void render(Graphics g) {
         g.setColor(Color.MAGENTA);
-        g.fillRect(x, y, width, height);
+        g.fillRect(getX(), getY(), getWidth(), getHeight());
         g.setColor(Color.WHITE);
-        g.drawString("E", x + 5, y + 15);
+        g.drawString("E", getX() + 5, getY() + 15);
     }
 }

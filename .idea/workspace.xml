@@ -6,12 +6,45 @@
   <component name="ChangeListManager">
     <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="sửa thanh paddle">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/.idea/main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/Ball.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Ball.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/Brick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Brick.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/ExpandPaddlePowerUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/ExpandPaddlePowerUp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/FastBallPowerUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/FastBallPowerUp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/GameObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/LaserBeam.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/LaserBeam.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/LaserPowerUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/LaserPowerUp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/MovableObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/MovableObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/Multiball.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Multiball.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/NormalBrick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/NormalBrick.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/Paddle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Paddle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/GameManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/Paddle.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/Paddle.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/map/map.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/PowerUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/PowerUp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/StrongBrick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/StrongBrick.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/VeryStrongBrick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/VeryStrongBrick.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/gameView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/gameView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/Ball.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/Brick.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/ExpandPaddlePowerUp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/FastBallPowerUp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/GameObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/LaserBeam.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/LaserPowerUp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/LevelManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/LevelManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/MovableObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/Multiball.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/NormalBrick.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/Paddle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/PowerUp.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/StrongBrick.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/VeryStrongBrick.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/gameView.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,12 +73,15 @@
     &quot;assignee&quot;: &quot;huukien128&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/huukien128/oop.git&quot;,
-    &quot;accountId&quot;: &quot;5dd35dc4-1c6e-455c-a347-786dbb5528bf&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/huukien128/oop.git",
+    "accountId": "af8e37b5-2afa-412b-9bf6-4c3afacc3d16"
   }
-}</component>
+}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -62,7 +98,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;quang&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;local__Kien&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -150,7 +186,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/master" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
@@ -168,16 +204,5 @@
     <MESSAGE value="sửa lại level bằng cách load file map.txt" />
     <MESSAGE value="sửa thanh paddle" />
     <option name="LAST_COMMIT_MESSAGE" value="sửa thanh paddle" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/src/main/java/Ball.java</url>
-          <line>2</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

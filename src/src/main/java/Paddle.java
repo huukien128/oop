@@ -40,32 +40,27 @@ class Paddle extends MovableObject {
     public boolean isLaserReady() { return isLaserReady; }
     public long getLaserActivationTime() { return laserActivationTime; }
 
-    // Phương thức mới để đặt vận tốc
     public void setDx(int dx) {
         this.dx = dx;
     }
 
-    // Xóa moveLeft() và moveRight() cũ vì chúng ta dùng update()
-
     @Override
     public void move() {
-        // Áp dụng vận tốc cho vị trí
-        x += dx * speed;
+        setX(getX() + dx * getSpeed());
     }
 
     @Override
     public void update() {
-        // Cập nhật vị trí trong mỗi khung hình dựa trên vận tốc đã đặt
         move();
     }
 
     @Override
     public void render(Graphics g) {
         if (paddleImage != null) {
-            g.drawImage(paddleImage, x, y, width, height, null);
+            g.drawImage(paddleImage, getX(), getY(), getWidth(), getHeight(), null);
         } else {
             g.setColor(Color.WHITE);
-            g.fillRect(x, y, width, height);
+            g.fillRect(getX(), getY(), getWidth(), getHeight());
         }
     }
 }

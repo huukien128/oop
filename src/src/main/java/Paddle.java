@@ -3,6 +3,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 class Paddle extends MovableObject {
     private final int defaultWidth;
@@ -16,12 +17,18 @@ class Paddle extends MovableObject {
         super(x, y, width, height, speed, 0, 0);
         this.defaultWidth = width;
 
-        try {
-            paddleImage = ImageIO.read(new File("C:/Users/admin/oop/assets/images/paddle.png"));
+        try (InputStream is = getClass().getResourceAsStream("/images/paddle.png")) {
+            if (is != null) {
+                paddleImage = ImageIO.read(is);
+                System.out.println("Tải ảnh paddle thành công");
+            } else {
+                System.err.println("LỖI: Không tìm thấy tệp /images/paddle.png.");
+            }
         } catch (IOException e) {
-            System.err.println("Lỗi tải ảnh paddle: " + e.getMessage());
+            System.err.println("Lỗi xử lý ảnh paddle: " + e.getMessage());
             e.printStackTrace();
         }
+
     }
 
     public int getDefaultWidth() {

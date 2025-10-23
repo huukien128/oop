@@ -1,4 +1,4 @@
-package object.powerup;
+package object.laser;
 
 import object.GameObject;
 

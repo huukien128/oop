@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="chia pagakes">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/game/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/game/GameManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/paddle/ExpandPaddlePowerUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/powerup/ExpandPaddlePowerUp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/powerup/LaserBeam.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/laser/LaserBeam.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/ball/Multiball.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/powerup/Multiball.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761205369098</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="chia pagakes">
+      <option name="closed" value="true" />
+      <created>1761205620739</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1761205620739</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

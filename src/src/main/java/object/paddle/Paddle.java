@@ -20,17 +20,6 @@ public class Paddle extends MovableObject {
         super(x, y, width, height, speed, 0, 0);
         this.defaultWidth = width;
 
-        try (InputStream is = getClass().getResourceAsStream("/images/paddle.png")) {
-            if (is != null) {
-                paddleImage = ImageIO.read(is);
-                System.out.println("Tải ảnh paddle thành công");
-            } else {
-                System.err.println("LỖI: Không tìm thấy tệp /images/paddle.png.");
-            }
-        } catch (IOException e) {
-            System.err.println("Lỗi xử lý ảnh paddle: " + e.getMessage());
-            e.printStackTrace();
-        }
 
     }
 

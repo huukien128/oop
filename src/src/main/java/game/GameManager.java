@@ -1,7 +1,7 @@
 package game;
 
 import manager.LevelManager;
-import object.ball.Multiball;
+import object.powerup.Multiball;
 import object.laser.LaserBeam;
 import object.powerup.ExpandPaddlePowerUp;
 import object.paddle.Paddle;
@@ -13,11 +13,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.io.File;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
@@ -51,10 +51,15 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private final int POWERUP_DROP_CHANCE = 30;
 
     public GameManager() {
-        try {
-            backgroundImage = ImageIO.read(new File("../../imagines/background.png"));
+        try (InputStream is = getClass().getResourceAsStream("/images/background.png")) {
+            if (is != null) {
+                backgroundImage = ImageIO.read(is);
+                System.out.println("Tải ảnh background thành công");
+            } else {
+                System.err.println("LỖI: Không tìm thấy tệp /images/background.png.");
+            }
         } catch (IOException e) {
-            System.err.println("Lỗi tải ảnh background: " + e.getMessage());
+            System.err.println("Lỗi xử lý ảnh background: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -288,7 +293,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         String puStatus = activePowerUp != null ? activePowerUp.getType() :
                 (paddle.isLaserReady() ? "Laser Pending" : "None");
-        g.drawString("object.powerup.PowerUp Active: " + puStatus, 10, 80);
+        g.drawString("PowerUp Active: " + puStatus, 10, 80);
 
         if (gameState.equals("gameOver")) {
             g.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);

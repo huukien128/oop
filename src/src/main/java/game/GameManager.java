@@ -246,7 +246,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 gameState = "gameWin";
             } else {
                 balls.clear();
-                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
+                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
                 paddle.setActiveLaser(false);
                 laserBeam = null;
             }

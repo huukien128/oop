@@ -2,7 +2,8 @@ package game;
 
 import manager.LevelManager;
 import object.ball.Multiball;
-import object.paddle.ExpandPaddlePowerUp;
+import object.laser.LaserBeam;
+import object.powerup.ExpandPaddlePowerUp;
 import object.paddle.Paddle;
 import object.ball.Ball;
 import object.brick.Brick;

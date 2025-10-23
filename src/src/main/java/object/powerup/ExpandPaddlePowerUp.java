@@ -1,7 +1,7 @@
-package object.paddle;
+package object.powerup;
 
 import object.ball.Ball;
-import object.powerup.PowerUp;
+import object.paddle.Paddle;
 
 import java.awt.*;
 

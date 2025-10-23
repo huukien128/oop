@@ -1,8 +1,10 @@
+package game;
+
 import javax.swing.*;
 
 public class gameView {
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Breakout Game");
+        JFrame frame = new JFrame("Ankanoird Game");
         GameManager gameManager = new GameManager();
         frame.add(gameManager);
         frame.setSize(GameManager.GAME_WIDTH, GameManager.GAME_HEIGHT);

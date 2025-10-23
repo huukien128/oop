@@ -1,3 +1,5 @@
+package object.brick;
+
 import java.awt.*;
 
 public class NormalBrick extends Brick {

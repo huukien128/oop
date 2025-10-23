@@ -1,11 +1,14 @@
+package object.paddle;
+
+import object.MovableObject;
+
 import java.awt.*;
 import javax.imageio.ImageIO;
-import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
-class Paddle extends MovableObject {
+public class Paddle extends MovableObject {
     private final int defaultWidth;
     private boolean isLaserReady = false;
     private long laserActivationTime = 0;

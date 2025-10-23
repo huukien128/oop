@@ -1,6 +1,11 @@
+package object.powerup;
+
+import object.ball.Ball;
+import object.paddle.Paddle;
+
 import java.awt.*;
 
-class LaserPowerUp extends PowerUp {
+public class LaserPowerUp extends PowerUp {
 
     public LaserPowerUp(int x, int y, int width, int height) {
         super(x, y, width, height, "LaserShot", 100);

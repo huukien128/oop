@@ -1,6 +1,10 @@
+package object.powerup;
+
+import object.GameObject;
+
 import java.awt.*;
 
-class LaserBeam extends GameObject {
+public class LaserBeam extends GameObject {
     private final int DURATION = 500;
     private long startTime;
 

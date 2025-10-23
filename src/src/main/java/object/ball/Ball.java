@@ -1,3 +1,8 @@
+package object.ball;
+
+import object.GameObject;
+import object.MovableObject;
+
 import java.awt.*;
 
 public class Ball extends MovableObject {

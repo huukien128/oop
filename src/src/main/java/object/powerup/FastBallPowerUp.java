@@ -1,3 +1,8 @@
+package object.powerup;
+
+import object.ball.Ball;
+import object.paddle.Paddle;
+
 import java.awt.*;
 import java.util.List;
 

@@ -1,3 +1,8 @@
+package object.ball;
+
+import object.paddle.Paddle;
+import object.powerup.PowerUp;
+
 import java.awt.*;
 import java.util.List;
 import java.util.Random;
@@ -8,7 +13,7 @@ public class Multiball extends PowerUp {
     private static final int DEFAULT_DURATION = 10000;
 
     public Multiball(int x, int y, int width, int height, List<Ball> balls, int newBallsCount) {
-        super(x, y, width, height, "Multiball", DEFAULT_DURATION);
+        super(x, y, width, height, "object.ball.Multiball", DEFAULT_DURATION);
         this.balls = balls;
         this.numberOfNewBalls = newBallsCount;
     }
@@ -33,7 +38,7 @@ public class Multiball extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        // Không cần gỡ bỏ hiệu ứng.
+
     }
 
     @Override

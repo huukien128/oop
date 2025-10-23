@@ -1,3 +1,8 @@
+package object.paddle;
+
+import object.ball.Ball;
+import object.powerup.PowerUp;
+
 import java.awt.*;
 
 public class ExpandPaddlePowerUp extends PowerUp {

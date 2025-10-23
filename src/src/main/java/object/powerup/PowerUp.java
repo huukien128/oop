@@ -1,3 +1,9 @@
+package object.powerup;
+
+import object.GameObject;
+import object.paddle.Paddle;
+import object.ball.Ball;
+
 import java.awt.*;
 
 public abstract class PowerUp extends GameObject {

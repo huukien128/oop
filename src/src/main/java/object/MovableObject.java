@@ -1,3 +1,5 @@
+package object;
+
 public abstract class MovableObject extends GameObject {
     private int dx;
     private int dy;

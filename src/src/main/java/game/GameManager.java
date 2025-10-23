@@ -1,3 +1,13 @@
+package game;
+
+import manager.LevelManager;
+import object.ball.Multiball;
+import object.paddle.ExpandPaddlePowerUp;
+import object.paddle.Paddle;
+import object.ball.Ball;
+import object.brick.Brick;
+import object.powerup.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -41,7 +51,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
     public GameManager() {
         try {
-            backgroundImage = ImageIO.read(new File("C:/Users/admin/oop/assets/images/background.png"));
+            backgroundImage = ImageIO.read(new File("../../imagines/background.png"));
         } catch (IOException e) {
             System.err.println("Lỗi tải ảnh background: " + e.getMessage());
             e.printStackTrace();
@@ -277,7 +287,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         String puStatus = activePowerUp != null ? activePowerUp.getType() :
                 (paddle.isLaserReady() ? "Laser Pending" : "None");
-        g.drawString("PowerUp Active: " + puStatus, 10, 80);
+        g.drawString("object.powerup.PowerUp Active: " + puStatus, 10, 80);
 
         if (gameState.equals("gameOver")) {
             g.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);

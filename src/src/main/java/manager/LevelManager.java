@@ -1,3 +1,10 @@
+package manager;
+
+import object.brick.Brick;
+import object.brick.NormalBrick;
+import object.brick.StrongBrick;
+import object.brick.VeryStrongBrick;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;

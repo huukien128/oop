@@ -26,10 +26,9 @@ public class Multiball extends GraphicalPowerUp {
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
         Random random = new Random();
-        int baseSpeed = ball.getSpeed();
 
         for (int i = 0; i < numberOfNewBalls; i++) {
-            Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), baseSpeed, 0, 0);
+            Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), ball.getSpeed(), 0, 0);
 
             int dx = random.nextBoolean() ? 1 : -1;
             int dy = -1;

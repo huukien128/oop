@@ -5,11 +5,15 @@ import object.paddle.Paddle;
 
 import java.awt.*;
 
-public class ExpandPaddlePowerUp extends PowerUp {
-    private static final int EXPAND_AMOUNT = 50;
+// Kế thừa từ lớp chung xử lý đồ họa
+public class ExpandPaddlePowerUp extends GraphicalPowerUp {
+    private static final int EXPAND_AMOUNT = 30; // Giảm kích thước để tránh lỗi tràn màn hình
+
+    // ĐƯỜNG DẪN ẢNH TƯƠNG ĐỐI
+    private static final String IMAGE_PATH = "/assets/images/expand_pu.png";
 
     public ExpandPaddlePowerUp(int x, int y, int width, int height) {
-        super(x, y, width, height, "ExpandPaddle", 5000);
+        super(x, y, width, height, "ExpandPaddle", 5000, IMAGE_PATH);
     }
 
     @Override
@@ -20,15 +24,10 @@ public class ExpandPaddlePowerUp extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        paddle.setWidth(paddle.getWidth() - EXPAND_AMOUNT);
+        // Sử dụng chiều rộng mặc định (getDefaultWidth()) để reset chính xác
+        paddle.setWidth(paddle.getDefaultWidth());
         paddle.setX(paddle.getX() + EXPAND_AMOUNT / 2);
     }
 
-    @Override
-    public void render(Graphics g) {
-        g.setColor(Color.MAGENTA);
-        g.fillRect(getX(), getY(), getWidth(), getHeight());
-        g.setColor(Color.WHITE);
-        g.drawString("E", getX() + 5, getY() + 15);
-    }
+    // Phương thức render đã được kế thừa từ GraphicalPowerUp
 }

@@ -5,27 +5,19 @@ import object.paddle.Paddle;
 
 import java.awt.*;
 import java.util.List;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
-import java.awt.image.BufferedImage;
 
-public class FastBallPowerUp extends PowerUp {
+// Kế thừa từ lớp chung xử lý đồ họa
+public class FastBallPowerUp extends GraphicalPowerUp {
     private static final int BOOST_AMOUNT = 1;
     private List<Ball> balls;
-    private BufferedImage powerUpImage;
+
+    // ĐƯỜNG DẪN ẢNH TƯƠNG ĐỐI
+    private static final String IMAGE_PATH = "/assets/images/fastball.png";
 
     public FastBallPowerUp(int x, int y, int width, int height, List<Ball> balls) {
-        super(x, y, width, height, "FastBall", 5000);
+        // Gọi constructor lớp cha: (vị trí, kích thước, tên, thời gian, path)
+        super(x, y, width, height, "FastBall", 5000, IMAGE_PATH);
         this.balls = balls;
-
-        // TẢI ẢNH
-        try {
-            // THAY ĐƯỜNG DẪN ẢNH TẠI ĐÂY (VÍ DỤ: fastball.png)
-            powerUpImage = ImageIO.read(new File("PASTE YOUR FASTBALL IMAGE PATH HERE"));
-        } catch (IOException e) {
-            System.err.println("Lỗi tải ảnh FastBall: " + e.getMessage());
-        }
     }
 
     @Override
@@ -44,15 +36,5 @@ public class FastBallPowerUp extends PowerUp {
         }
     }
 
-    @Override
-    public void render(Graphics g) {
-        if (powerUpImage != null) {
-            g.drawImage(powerUpImage, getX(), getY(), getWidth(), getHeight(), null);
-        } else {
-            g.setColor(Color.ORANGE);
-            g.fillOval(getX(), getY(), getWidth(), getHeight());
-            g.setColor(Color.BLACK);
-            g.drawString("F", getX() + 5, getY() + 15);
-        }
-    }
+    // Phương thức render đã được kế thừa và xử lý trong GraphicalPowerUp
 }

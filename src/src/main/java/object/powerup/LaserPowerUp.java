@@ -5,10 +5,14 @@ import object.paddle.Paddle;
 
 import java.awt.*;
 
-public class LaserPowerUp extends PowerUp {
+// Kế thừa từ lớp chung xử lý đồ họa
+public class LaserPowerUp extends GraphicalPowerUp {
+
+    // ĐƯỜNG DẪN ẢNH TƯƠNG ĐỐI
+    private static final String IMAGE_PATH = "/assets/images/laser_pu.png";
 
     public LaserPowerUp(int x, int y, int width, int height) {
-        super(x, y, width, height, "LaserShot", 100);
+        super(x, y, width, height, "LaserShot", 100, IMAGE_PATH);
     }
 
     @Override
@@ -19,11 +23,5 @@ public class LaserPowerUp extends PowerUp {
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {}
 
-    @Override
-    public void render(Graphics g) {
-        g.setColor(new Color(255, 165, 0));
-        g.fillOval(getX(), getY(), getWidth(), getHeight());
-        g.setColor(Color.WHITE);
-        g.drawString("L", getX() + 5, getY() + 15);
-    }
+    // Phương thức render đã được kế thừa từ GraphicalPowerUp
 }

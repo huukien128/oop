@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="">
+    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="thêm class cài đồ họa">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/powerup/FastBallPowerUp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/powerup/FastBallPowerUp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/object/powerup/FastBallPowerUp.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/object/powerup/FastBallPowerUp.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/brick/NormalBrick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/brick/NormalBrick.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/brick/StrongBrick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/brick/StrongBrick.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/object/brick/VeryStrongBrick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/object/brick/VeryStrongBrick.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,8 +18,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="package-info" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -53,6 +54,9 @@
     &quot;repository&quot;: &quot;oop&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -61,29 +65,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.GameManager.executor": "Run",
-    "Application.gameView.executor": "Run",
-    "Maven.src [package].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "quang",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/oop",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.GameManager.executor&quot;: &quot;Run&quot;,
+    &quot;Application.gameView.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.src [package].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;quang&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/oop&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -165,7 +169,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761205620739</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="thêm class cài đồ họa">
+      <option name="closed" value="true" />
+      <created>1761218385721</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1761218385721</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -201,7 +213,8 @@
     <MESSAGE value="sửa thanh paddle" />
     <MESSAGE value="sửa phạm vi truy cập của biến và hàm" />
     <MESSAGE value="chia pagakes" />
-    <option name="LAST_COMMIT_MESSAGE" value="chia pagakes" />
+    <MESSAGE value="thêm class cài đồ họa" />
+    <option name="LAST_COMMIT_MESSAGE" value="thêm class cài đồ họa" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

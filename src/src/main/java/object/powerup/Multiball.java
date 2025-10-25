@@ -7,13 +7,18 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-public class Multiball extends PowerUp {
+// Kế thừa từ lớp chung xử lý đồ họa
+public class Multiball extends GraphicalPowerUp {
     private List<Ball> balls;
     private int numberOfNewBalls;
     private static final int DEFAULT_DURATION = 10000;
 
+    // ĐƯỜNG DẪN ẢNH TƯƠNG ĐỐI
+    private static final String IMAGE_PATH = "/assets/images/multiball.png";
+
     public Multiball(int x, int y, int width, int height, List<Ball> balls, int newBallsCount) {
-        super(x, y, width, height, "object.powerup.Multiball", DEFAULT_DURATION);
+        // Tên lớp được sửa lại thành "Multiball"
+        super(x, y, width, height, "Multiball", DEFAULT_DURATION, IMAGE_PATH);
         this.balls = balls;
         this.numberOfNewBalls = newBallsCount;
     }
@@ -38,14 +43,8 @@ public class Multiball extends PowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-
+        // Không cần gỡ bỏ hiệu ứng
     }
 
-    @Override
-    public void render(Graphics g) {
-        g.setColor(Color.CYAN);
-        g.fillOval(getX(), getY(), getWidth(), getHeight());
-        g.setColor(Color.WHITE);
-        g.drawString(String.valueOf(numberOfNewBalls), getX() + getWidth() / 4, getY() + getHeight() / 2 + 5);
-    }
+    // Phương thức render đã được kế thừa từ GraphicalPowerUp
 }

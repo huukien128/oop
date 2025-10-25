@@ -36,7 +36,10 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private List<PowerUp> powerUps;
     private int score;
     private int lives;
-    private String gameState;
+
+    // Khởi tạo trạng thái game là "paused" (chờ bắt đầu)
+    private String gameState = "paused";
+    private boolean gameStarted = false;
 
     private LaserBeam laserBeam = null;
 
@@ -49,6 +52,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private final int PADDLE_SPEED = 10;
     private final int BALL_START_SPEED = 2;
     private final int POWERUP_DROP_CHANCE = 30;
+
+    // Biến lưu trạng thái phím di chuyển
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
+
+    // Khởi tạo Random cho hướng bay bóng
+    private final Random random = new Random();
+
 
     public GameManager() {
         try (InputStream is = getClass().getResourceAsStream("/images/background.png")) {
@@ -72,11 +83,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private void initGame() {
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 140, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
-        balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
+        balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 0, 0));
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
-        gameState = "playing";
+        gameState = "paused"; // Khởi tạo ban đầu là paused
+        gameStarted = false;
 
         levelManager = new LevelManager(GAME_WIDTH, GAME_HEIGHT);
         bricks = levelManager.createBricksForCurrentLevel();
@@ -87,12 +99,61 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         gameThread.start();
     }
 
+    /**
+     * Hàm helper để bắn bóng với hướng ngẫu nhiên.
+     */
+    private void launchBall(Ball ball) {
+        int speed = ball.getSpeed();
+        int dx = random.nextBoolean() ? speed : -speed;
+        int dy = -speed;
+
+        ball.setDx(dx);
+        ball.setDy(dy);
+    }
+
     public void updateGame() {
+        // Cập nhật vị trí bóng theo paddle khi game PAUSED
+        if (gameState.equals("paused") && balls.size() == 1) {
+            Ball ball = balls.get(0);
+            ball.setX(paddle.getX() + (paddle.getWidth() / 2 - ball.getWidth() / 2));
+            ball.setY(paddle.getY() - ball.getHeight());
+
+            // Vẫn cho phép di chuyển paddle khi paused
+            if (leftPressed) {
+                paddle.setDx(-1);
+            } else if (rightPressed) {
+                paddle.setDx(1);
+            } else {
+                paddle.setDx(0);
+            }
+            paddle.update();
+            // Giới hạn Paddle
+            if (paddle.getX() < 0) {
+                paddle.setX(0);
+            }
+            else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) {
+                paddle.setX(GAME_WIDTH - paddle.getWidth());
+            }
+            return;
+        }
+
+
         if (!gameState.equals("playing")) {
             return;
         }
 
+        // LOGIC DI CHUYỂN PADDLE LIÊN TỤC KHI PHÍM ĐƯỢC GIỮ
+        if (leftPressed) {
+            paddle.setDx(-1);
+        } else if (rightPressed) {
+            paddle.setDx(1);
+        } else {
+            paddle.setDx(0);
+        }
+
         paddle.update();
+
+        // Giới hạn Paddle
         if (paddle.getX() < 0) {
             paddle.setX(0);
         }
@@ -124,9 +185,21 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
-                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
+                // MẤT MẠNG: TỰ ĐỘNG sinh bóng và bắn ngay lập tức
+                // TỐC ĐỘ ĐỒNG NHẤT: BALL_START_SPEED = 2
+                Ball newBall = new Ball(
+                        paddle.getX() + (paddle.getWidth() / 2 - 10),
+                        paddle.getY() - 20,
+                        15, 15, BALL_START_SPEED, 0, 0);
+                balls.add(newBall);
+
                 paddle.setActiveLaser(false);
                 laserBeam = null;
+
+                // Bắn bóng tự động với hướng ngẫu nhiên
+                launchBall(newBall);
+                gameState = "playing"; // Tự động tiếp tục chơi
+
             } else {
                 gameState = "gameOver";
             }
@@ -140,6 +213,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             if (pu.checkCollision(paddle)) {
                 if (!balls.isEmpty()) {
                     if (pu instanceof Multiball) {
+                        // Multiball: Tốc độ bóng mới sẽ lấy từ BALL_START_SPEED
                         pu.applyEffect(paddle, balls.get(0));
                     } else if (pu instanceof LaserPowerUp) {
                         pu.applyEffect(paddle, balls.get(0));
@@ -181,6 +255,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         if (ball.checkCollision(paddle)) {
             ball.bounceOffObject(paddle);
+            return;
         }
 
         if (laserBeam != null) {
@@ -207,15 +282,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                     score += 10;
                     Random rand = new Random();
                     if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
-                        int powerUpType = rand.nextInt(4);
+                        int powerUpType = rand.nextInt(3); // Giảm số loại Power-Up còn 3
                         if (powerUpType == 0) {
                             powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
                         } else if (powerUpType == 1) {
                             powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
-                        } else if (powerUpType == 2) {
-                            powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
                         } else {
-                            powerUps.add(new LaserPowerUp(brick.getX(), brick.getY(), 20, 20));
+                            // Multiball
+                            powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
                         }
                     }
                     brickIterator.remove();
@@ -246,9 +320,13 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 gameState = "gameWin";
             } else {
                 balls.clear();
-                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
+                balls.add(new Ball(
+                        paddle.getX() + (paddle.getWidth() / 2 - 10),
+                        paddle.getY() - 20,
+                        15, 15, BALL_START_SPEED, 0, 0));
                 paddle.setActiveLaser(false);
                 laserBeam = null;
+                gameState = "paused";
             }
         }
     }
@@ -285,6 +363,27 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
 
         g.setColor(Color.BLACK);
+
+        if (gameState.equals("gameOver")) {
+            g.setFont(new Font("Arial", Font.BOLD, 30));
+            g.drawString("GAME OVER! Press SPACE to Play Again", GAME_WIDTH / 2 - 250, GAME_HEIGHT / 2);
+        } else if (gameState.equals("gameWin")) {
+            g.setFont(new Font("Arial", Font.BOLD, 30));
+            g.drawString("YOU WIN! Press SPACE to Play Again", GAME_WIDTH / 2 - 250, GAME_HEIGHT / 2);
+        } else if (gameState.equals("paused") && !gameStarted) {
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Press SPACE to Start", GAME_WIDTH / 2 - 100, GAME_HEIGHT / 2);
+        } else if (gameState.equals("paused") && gameStarted) {
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            String msg = "PAUSED. Press SPACE to Continue";
+            if (balls.size() == 1 && balls.get(0).getDy() == 0) {
+                msg = "Level " + levelManager.getCurrentLevel() + " complete! Press SPACE to Launch Ball";
+            }
+            g.drawString(msg, GAME_WIDTH / 2 - 150, GAME_HEIGHT / 2);
+        }
+
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.PLAIN, 16));
         g.drawString("Score: " + score, 10, 20);
         g.setColor(Color.RED);
         g.drawString("Lives: " + lives, 10, 40);
@@ -295,16 +394,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 (paddle.isLaserReady() ? "Laser Pending" : "None");
         g.drawString("PowerUp Active: " + puStatus, 10, 80);
 
-        if (gameState.equals("gameOver")) {
-            g.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);
-        } else if (gameState.equals("gameWin")) {
-            g.drawString("You Win!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);
-        }
     }
 
     @Override
     public void run() {
-        while (!gameState.equals("gameOver") && !gameState.equals("gameWin")) {
+        while (true) {
             updateGame();
             repaint();
             try {
@@ -318,19 +412,56 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
+
+        // LOGIC CHỈ DÙNG SPACE ĐỂ CHƠI LẠI KHI THUA/THẮNG
+        if (key == KeyEvent.VK_SPACE) {
+            if (gameState.equals("gameOver") || gameState.equals("gameWin")) {
+                initGame();
+                gameStarted = false;
+                return; // Chơi lại từ đầu
+            }
+
+            if (!gameStarted) {
+                // Bắt đầu game lần đầu tiên
+                gameState = "playing";
+                gameStarted = true;
+                if (!balls.isEmpty()) {
+                    launchBall(balls.get(0)); // Bắn bóng ngẫu nhiên
+                }
+            } else if (gameState.equals("playing")) {
+                // Tạm dừng game
+                gameState = "paused";
+            } else if (gameState.equals("paused")) {
+                // Tiếp tục game (khi pause thủ công) hoặc Bắn bóng (sau khi qua màn)
+                gameState = "playing";
+
+                // Nếu bóng đang "dính" paddle (tức là dy=0), thì bắn nó đi
+                if (balls.size() == 1 && balls.get(0).getDy() == 0) {
+                    launchBall(balls.get(0));
+                }
+            }
+        }
+
+        // LOGIC ĐIỀU KHIỂN PADDLE (Sử dụng cờ leftPressed/rightPressed)
         if (key == KeyEvent.VK_LEFT) {
-            paddle.setDx(-1);
+            leftPressed = true;
         }
         if (key == KeyEvent.VK_RIGHT) {
-            paddle.setDx(1);
+            rightPressed = true;
         }
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
-            paddle.setDx(0);
+
+        // Cập nhật cờ khi nhả phím
+        if (key == KeyEvent.VK_LEFT) {
+            leftPressed = false;
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            rightPressed = false;
         }
     }
 

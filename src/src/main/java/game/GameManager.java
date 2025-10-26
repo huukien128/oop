@@ -36,7 +36,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private List<PowerUp> powerUps;
     private int score;
     private int lives;
-    private String gameState;
+    private String gameState; // "ready", "playing", "paused", "gameOver", "gameWin"
 
     private LaserBeam laserBeam = null;
 
@@ -72,14 +72,27 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
     }
 
+    private void createStartingBall() {
+        Ball newBall = new Ball(
+                paddle.getX() + (paddle.getWidth() / 2 - 10),
+                paddle.getY() - 20,
+                15, 15,
+                BALL_START_SPEED,
+                0, 0
+        );
+        balls.add(newBall);
+    }
+
     private void initGame() {
         paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 140, 50, PADDLE_SPEED);
         balls = new ArrayList<>();
-        balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
+
+        createStartingBall();
+
         powerUps = new ArrayList<>();
         score = 0;
         lives = 3;
-        gameState = "playing";
+        gameState = "ready";
 
         levelManager = new LevelManager(GAME_WIDTH, GAME_HEIGHT);
         bricks = levelManager.createBricksForCurrentLevel();
@@ -91,7 +104,24 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     public void updateGame() {
-        if (!gameState.equals("playing")) {
+        if (gameState.equals("paused")) {
+            return;
+        }
+
+        if (gameState.equals("ready")) {
+            paddle.update();
+            if (paddle.getX() < 0) {
+                paddle.setX(0);
+            }
+            else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) {
+                paddle.setX(GAME_WIDTH - paddle.getWidth());
+            }
+
+            if (!balls.isEmpty()) {
+                Ball ball = balls.get(0);
+                ball.setX(paddle.getX() + (paddle.getWidth() / 2 - ball.getWidth() / 2));
+                ball.setY(paddle.getY() - ball.getHeight());
+            }
             return;
         }
 
@@ -127,9 +157,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         if (balls.isEmpty()) {
             lives--;
             if (lives > 0) {
-                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 15, 15, BALL_START_SPEED, 1, -1));
+                createStartingBall();
                 paddle.setActiveLaser(false);
                 laserBeam = null;
+                if (activePowerUp != null && !(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
+                    activePowerUp.removeEffect(paddle, balls.get(0));
+                    activePowerUp = null;
+                }
+                gameState = "ready";
             } else {
                 gameState = "gameOver";
             }
@@ -148,7 +183,10 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                         pu.applyEffect(paddle, balls.get(0));
                     } else {
                         if (activePowerUp != null) {
-                            activePowerUp.removeEffect(paddle, balls.get(0));
+                            Ball currentBall = balls.isEmpty() ? null : balls.get(0);
+                            if (currentBall != null) {
+                                activePowerUp.removeEffect(paddle, currentBall);
+                            }
                         }
                         activePowerUp = pu;
                         activePowerUp.applyEffect(paddle, balls.get(0));
@@ -208,19 +246,25 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 brick.takeHit();
                 if (brick.isDestroyed()) {
                     score += 10;
-                    Random rand = new Random();
-                    if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
-                        int powerUpType = rand.nextInt(4);
-                        if (powerUpType == 0) {
-                            powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
-                        } else if (powerUpType == 1) {
-                            powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
-                        } else if (powerUpType == 2) {
-                            powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
-                        } else {
-                            powerUps.add(new LaserPowerUp(brick.getX(), brick.getY(), 20, 20));
+
+                    // THAY ĐỔI: Thêm kiểm tra viên gạch cuối cùng
+                    // Nếu số lượng gạch còn lại (trừ gạch hiện tại sắp bị xóa) bằng 0, thì không rơi Power-Up
+                    if (bricks.size() > 1) {
+                        Random rand = new Random();
+                        if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
+                            int powerUpType = rand.nextInt(4);
+                            if (powerUpType == 0) {
+                                powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
+                            } else if (powerUpType == 1) {
+                                powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
+                            } else if (powerUpType == 2) {
+                                powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
+                            } else if (powerUpType == 3) {
+                                powerUps.add(new LaserPowerUp(brick.getX(), brick.getY(), 20, 20));
+                            }
                         }
-                    }
+                    } // Kết thúc kiểm tra Power-Up
+
                     brickIterator.remove();
                 }
                 break;
@@ -249,9 +293,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 gameState = "gameWin";
             } else {
                 balls.clear();
-                balls.add(new Ball(paddle.getX() + (paddle.getWidth() / 2 - 10), paddle.getY() - 20, 20, 20, BALL_START_SPEED, 1, -1));
+                createStartingBall();
                 paddle.setActiveLaser(false);
                 laserBeam = null;
+                if (activePowerUp != null && !(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
+                    activePowerUp.removeEffect(paddle, balls.get(0));
+                    activePowerUp = null;
+                }
+                gameState = "ready";
             }
         }
     }
@@ -264,7 +313,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     public void draw(Graphics g) {
-        // Sử dụng Graphics2D và RenderingHints để vẽ Pixel Art sắc nét
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -303,10 +351,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 (paddle.isLaserReady() ? "Laser Pending" : "None");
         g2d.drawString("PowerUp Active: " + puStatus, 10, 80);
 
-        if (gameState.equals("gameOver")) {
-            g2d.drawString("Game Over!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);
+        g2d.setFont(new Font("Arial", Font.BOLD, 30));
+        if (gameState.equals("ready")) {
+            g2d.setColor(Color.WHITE);
+            g2d.drawString("PRESS SPACE TO START", GAME_WIDTH / 2 - 190, GAME_HEIGHT / 2);
+        } else if (gameState.equals("paused")) {
+            g2d.setColor(Color.WHITE);
+            g2d.drawString("PAUSED - PRESS SPACE TO RESUME", GAME_WIDTH / 2 - 270, GAME_HEIGHT / 2);
+        } else if (gameState.equals("gameOver")) {
+            g2d.drawString("Game Over!", GAME_WIDTH / 2 - 80, GAME_HEIGHT / 2);
         } else if (gameState.equals("gameWin")) {
-            g2d.drawString("You Win!", GAME_WIDTH / 2 - 40, GAME_HEIGHT / 2);
+            g2d.drawString("You Win!", GAME_WIDTH / 2 - 60, GAME_HEIGHT / 2);
         }
     }
 
@@ -326,19 +381,40 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT) {
-            paddle.setDx(-1);
+
+        if (key == KeyEvent.VK_SPACE) {
+            if (gameState.equals("ready")) {
+                if (!balls.isEmpty()) {
+                    Ball ball = balls.get(0);
+                    ball.setDx(1);
+                    ball.setDy(-1);
+                    gameState = "playing";
+                }
+            } else if (gameState.equals("playing")) {
+                gameState = "paused";
+            } else if (gameState.equals("paused")) {
+                gameState = "playing";
+            }
+            return;
         }
-        if (key == KeyEvent.VK_RIGHT) {
-            paddle.setDx(1);
+
+        if (gameState.equals("ready") || gameState.equals("playing")) {
+            if (key == KeyEvent.VK_LEFT) {
+                paddle.setDx(-1);
+            }
+            if (key == KeyEvent.VK_RIGHT) {
+                paddle.setDx(1);
+            }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
-            paddle.setDx(0);
+        if (gameState.equals("ready") || gameState.equals("playing")) {
+            if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+                paddle.setDx(0);
+            }
         }
     }
 

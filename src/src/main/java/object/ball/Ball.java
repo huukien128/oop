@@ -17,8 +17,11 @@ public class Ball extends MovableObject {
 
     @Override
     public void move() {
-        setX(getX() + getDx() * getSpeed());
-        setY(getY() + getDy() * getSpeed());
+        // CHỈ DI CHUYỂN NẾU CÓ HƯỚNG
+        if (getDx() != 0 || getDy() != 0) {
+            setX(getX() + getDx() * getSpeed());
+            setY(getY() + getDy() * getSpeed());
+        }
     }
 
 

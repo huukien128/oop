@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="sửa lại level bằng cách load file map.txt">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/GameManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/LevelManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/Paddle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Paddle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/GameManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/LevelManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/LevelManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/Paddle.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/Paddle.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/map/map.txt" afterDir="false" />
-    </list>
+    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="bổ sung" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,6 +13,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="package-info" />
         <option value="Class" />
       </list>
     </option>
@@ -34,6 +25,7 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -44,9 +36,22 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/huukien128/oop.git&quot;,
-    &quot;accountId&quot;: &quot;af8e37b5-2afa-412b-9bf6-4c3afacc3d16&quot;
+    &quot;accountId&quot;: &quot;5dd35dc4-1c6e-455c-a347-786dbb5528bf&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;huukien128&quot;,
+    &quot;repository&quot;: &quot;oop&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -57,12 +62,13 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Application.GameManager.executor&quot;: &quot;Run&quot;,
     &quot;Application.gameView.executor&quot;: &quot;Run&quot;,
     &quot;Maven.src [package].executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;local__Thanh&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;quang&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -72,6 +78,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -125,7 +132,63 @@
       <option name="project" value="LOCAL" />
       <updated>1760501335791</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="sửa thanh paddle">
+      <option name="closed" value="true" />
+      <created>1760666343097</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1760666343097</updated>
+    </task>
+    <task id="LOCAL-00004" summary="sửa phạm vi truy cập của biến và hàm">
+      <option name="closed" value="true" />
+      <created>1761098454262</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1761098454262</updated>
+    </task>
+    <task id="LOCAL-00005" summary="chia pagakes">
+      <option name="closed" value="true" />
+      <created>1761205369097</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1761205369098</updated>
+    </task>
+    <task id="LOCAL-00006" summary="chia pagakes">
+      <option name="closed" value="true" />
+      <created>1761205620739</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1761205620739</updated>
+    </task>
+    <task id="LOCAL-00007" summary="thêm class cài đồ họa">
+      <option name="closed" value="true" />
+      <created>1761218385721</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1761218385721</updated>
+    </task>
+    <task id="LOCAL-00008" summary="thêm đường dẫn ảnh cho các file">
+      <option name="closed" value="true" />
+      <created>1761396636157</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1761396636157</updated>
+    </task>
+    <task id="LOCAL-00009" summary="bổ sung">
+      <option name="closed" value="true" />
+      <created>1761396670947</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1761396670947</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -142,7 +205,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="local" />
+                        <option value="origin/quang" />
                       </list>
                     </value>
                   </entry>
@@ -158,14 +221,20 @@
     <MESSAGE value="Merge branch 'master' into local" />
     <MESSAGE value="committt" />
     <MESSAGE value="sửa lại level bằng cách load file map.txt" />
-    <option name="LAST_COMMIT_MESSAGE" value="sửa lại level bằng cách load file map.txt" />
+    <MESSAGE value="sửa thanh paddle" />
+    <MESSAGE value="sửa phạm vi truy cập của biến và hàm" />
+    <MESSAGE value="chia pagakes" />
+    <MESSAGE value="thêm class cài đồ họa" />
+    <MESSAGE value="thêm đường dẫn ảnh cho các file" />
+    <MESSAGE value="bổ sung" />
+    <option name="LAST_COMMIT_MESSAGE" value="bổ sung" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/src/main/java/Ball.java</url>
-          <line>2</line>
+          <url>file://$PROJECT_DIR$/src/src/main/java/object/ball/Ball.java</url>
+          <line>5</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

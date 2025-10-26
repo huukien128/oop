@@ -12,19 +12,11 @@ public abstract class Brick extends GameObject {
         this.type = type;
     }
 
-    public void takeHit() {
-        hitPoints--;
-    }
+    public void takeHit() { hitPoints--; }
 
-    public int getHitPoints() {
-        return hitPoints;
-    }
+    public int getHitPoints() { return hitPoints; }
 
-    public boolean isDestroyed() {
-        return hitPoints <= 0;
-    }
+    public boolean isDestroyed() { return hitPoints <= 0; }
 
-    public String getType() {
-        return type;
-    }
+    public String getType() { return type; }
 }

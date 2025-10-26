@@ -3,10 +3,6 @@ package object.paddle;
 import object.MovableObject;
 
 import java.awt.*;
-import javax.imageio.ImageIO;
-import java.io.IOException;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
 
 public class Paddle extends MovableObject {
     private final int defaultWidth;
@@ -14,18 +10,15 @@ public class Paddle extends MovableObject {
     private long laserActivationTime = 0;
     private int dx = 0;
 
-    private BufferedImage paddleImage;
+    private final Image paddleImage;
 
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height, speed, 0, 0);
         this.defaultWidth = width;
-
-
+        this.paddleImage = loadImage("/images/paddle.png");
     }
 
-    public int getDefaultWidth() {
-        return defaultWidth;
-    }
+    public int getDefaultWidth() { return defaultWidth; }
 
     public void setActiveLaser(boolean active) {
         this.isLaserReady = active;
@@ -39,9 +32,7 @@ public class Paddle extends MovableObject {
     public boolean isLaserReady() { return isLaserReady; }
     public long getLaserActivationTime() { return laserActivationTime; }
 
-    public void setDx(int dx) {
-        this.dx = dx;
-    }
+    public void setDx(int dx) { this.dx = dx; }
 
     @Override
     public void move() {
@@ -49,14 +40,12 @@ public class Paddle extends MovableObject {
     }
 
     @Override
-    public void update() {
-        move();
-    }
+    public void update() { move(); }
 
     @Override
     public void render(Graphics g) {
-        if (paddleImage != null) {
-            g.drawImage(paddleImage, getX(), getY(), getWidth(), getHeight(), null);
+        if (this.paddleImage != null) {
+            g.drawImage(this.paddleImage, getX(), getY(), getWidth(), getHeight(), null);
         } else {
             g.setColor(Color.WHITE);
             g.fillRect(getX(), getY(), getWidth(), getHeight());

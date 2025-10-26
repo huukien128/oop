@@ -7,28 +7,27 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-// Kế thừa từ lớp chung xử lý đồ họa
-public class Multiball extends GraphicalPowerUp {
+public class Multiball extends PowerUp {
     private List<Ball> balls;
     private int numberOfNewBalls;
     private static final int DEFAULT_DURATION = 10000;
 
-    // ĐƯỜNG DẪN ẢNH TƯƠNG ĐỐI
-    private static final String IMAGE_PATH = "/assets/images/multiball.png";
+    private final Image powerUpImage;
 
     public Multiball(int x, int y, int width, int height, List<Ball> balls, int newBallsCount) {
-        // Tên lớp được sửa lại thành "Multiball"
-        super(x, y, width, height, "Multiball", DEFAULT_DURATION, IMAGE_PATH);
+        super(x, y, width, height, "Multiball", DEFAULT_DURATION);
         this.balls = balls;
         this.numberOfNewBalls = newBallsCount;
+        this.powerUpImage = loadImage("/images/powerup_multi.png");
     }
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
         Random random = new Random();
+        int baseSpeed = ball.getSpeed();
 
         for (int i = 0; i < numberOfNewBalls; i++) {
-            Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), ball.getSpeed(), 0, 0);
+            Ball newBall = new Ball(ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), baseSpeed, 0, 0);
 
             int dx = random.nextBoolean() ? 1 : -1;
             int dy = -1;
@@ -42,8 +41,17 @@ public class Multiball extends GraphicalPowerUp {
 
     @Override
     public void removeEffect(Paddle paddle, Ball ball) {
-        // Không cần gỡ bỏ hiệu ứng
     }
 
-    // Phương thức render đã được kế thừa từ GraphicalPowerUp
+    @Override
+    public void render(Graphics g) {
+        if (this.powerUpImage != null) {
+            g.drawImage(this.powerUpImage, getX(), getY(), getWidth(), getHeight(), null);
+        } else {
+            g.setColor(Color.CYAN);
+            g.fillOval(getX(), getY(), getWidth(), getHeight());
+            g.setColor(Color.WHITE);
+            g.drawString(String.valueOf(numberOfNewBalls), getX() + getWidth() / 4, getY() + getHeight() / 2 + 5);
+        }
+    }
 }

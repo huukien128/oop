@@ -8,8 +8,11 @@ public class LaserBeam extends GameObject {
     private final int DURATION = 500;
     private long startTime;
 
+    private final Image laserImage;
+
     public LaserBeam(int x, int y, int width, int height) {
         super(x, y, width, height);
+        this.laserImage = loadImage("/images/laser.png");
         this.startTime = System.currentTimeMillis();
     }
 
@@ -22,7 +25,11 @@ public class LaserBeam extends GameObject {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.RED.brighter());
-        g.fillRect(getX(), getY(), getWidth(), getHeight());
+        if (this.laserImage != null) {
+            g.drawImage(this.laserImage, getX(), getY(), getWidth(), getHeight(), null);
+        } else {
+            g.setColor(Color.RED.brighter());
+            g.fillRect(getX(), getY(), getWidth(), getHeight());
+        }
     }
 }

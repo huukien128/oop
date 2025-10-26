@@ -7,24 +7,12 @@ import java.awt.*;
 
 public class Ball extends MovableObject {
 
+    private final Image ballImage;
+
     public Ball(int x, int y, int width, int height, int speed, int dx, int dy) {
         super(x, y, width, height, speed, dx, dy);
-    }
 
-    public int getSpeed() {
-        return super.getSpeed();
-    }
-
-    public void setSpeed(int speed) {
-        super.setSpeed(speed);
-    }
-
-    public void setDx( int dx) {
-        super.setDx(dx);
-    }
-
-    public void setDy( int dy) {
-        super.setDy(dy);
+        this.ballImage = loadImage("/images/ball.png");
     }
 
     @Override
@@ -55,7 +43,11 @@ public class Ball extends MovableObject {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillOval(getX(), getY(), getWidth(), getHeight());
+        if (this.ballImage != null) {
+            g.drawImage(this.ballImage, getX(), getY(), getWidth(), getHeight(), null);
+        } else {
+            g.setColor(Color.RED);
+            g.fillOval(getX(), getY(), getWidth(), getHeight());
+        }
     }
 }

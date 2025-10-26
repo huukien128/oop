@@ -27,6 +27,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     public static final int GAME_HEIGHT = 600;
     private static final int DELAY = 10;
 
+    private static final int COLLISION_WIDTH = GAME_WIDTH - 10;
+
     private final int LASER_SHOT_DELAY = 1000;
     private final int LASER_WIDTH = 20;
 
@@ -36,7 +38,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private List<PowerUp> powerUps;
     private int score;
     private int lives;
-    private String gameState; // "ready", "playing", "paused", "gameOver", "gameWin"
+    private String gameState;
 
     private LaserBeam laserBeam = null;
 
@@ -84,7 +86,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void initGame() {
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 50, 140, 50, PADDLE_SPEED);
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
         balls = new ArrayList<>();
 
         createStartingBall();
@@ -110,12 +112,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         if (gameState.equals("ready")) {
             paddle.update();
-            if (paddle.getX() < 0) {
-                paddle.setX(0);
-            }
-            else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) {
-                paddle.setX(GAME_WIDTH - paddle.getWidth());
-            }
+            if (paddle.getX() < 0) paddle.setX(0);
+            else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) paddle.setX(GAME_WIDTH - paddle.getWidth());
 
             if (!balls.isEmpty()) {
                 Ball ball = balls.get(0);
@@ -126,12 +124,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
 
         paddle.update();
-        if (paddle.getX() < 0) {
-            paddle.setX(0);
-        }
-        else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) {
-            paddle.setX(GAME_WIDTH - paddle.getWidth());
-        }
+        if (paddle.getX() < 0) paddle.setX(0);
+        else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) paddle.setX(GAME_WIDTH - paddle.getWidth());
 
         handleLaserShot();
 
@@ -140,10 +134,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             Ball ball = ballIterator.next();
             ball.update();
 
-            if (ball.getX() <= 0 || ball.getX() >= GAME_WIDTH - ball.getWidth()) {
+            if (ball.getX() < 0) {
+                ball.setX(0);
+                ball.setDx(-ball.getDx());
+            } else if (ball.getX() > COLLISION_WIDTH - ball.getWidth()) {
+                ball.setX(COLLISION_WIDTH - ball.getWidth());
                 ball.setDx(-ball.getDx());
             }
-            if (ball.getY() <= 0) {
+
+            if (ball.getY() < 0) {
+                ball.setY(0);
                 ball.setDy(-ball.getDy());
             }
 
@@ -158,12 +158,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             lives--;
             if (lives > 0) {
                 createStartingBall();
-                paddle.setActiveLaser(false);
-                laserBeam = null;
-                if (activePowerUp != null && !(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
+
+                if (activePowerUp != null) {
                     activePowerUp.removeEffect(paddle, balls.get(0));
                     activePowerUp = null;
                 }
+
+                paddle.setActiveLaser(false);
+                laserBeam = null;
                 gameState = "ready";
             } else {
                 gameState = "gameOver";
@@ -177,19 +179,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
             if (pu.checkCollision(paddle)) {
                 if (!balls.isEmpty()) {
-                    if (pu instanceof Multiball) {
-                        pu.applyEffect(paddle, balls.get(0));
-                    } else if (pu instanceof LaserPowerUp) {
-                        pu.applyEffect(paddle, balls.get(0));
+                    Ball mainBall = balls.get(0);
+
+                    if (pu instanceof Multiball || pu instanceof LaserPowerUp) {
+                        pu.applyEffect(paddle, mainBall);
                     } else {
-                        if (activePowerUp != null) {
-                            Ball currentBall = balls.isEmpty() ? null : balls.get(0);
-                            if (currentBall != null) {
-                                activePowerUp.removeEffect(paddle, currentBall);
-                            }
-                        }
+                        if (activePowerUp != null) activePowerUp.removeEffect(paddle, mainBall);
                         activePowerUp = pu;
-                        activePowerUp.applyEffect(paddle, balls.get(0));
+                        activePowerUp.applyEffect(paddle, mainBall);
                         powerUpStartTime = System.currentTimeMillis();
                     }
                 }
@@ -211,60 +208,67 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             }
         }
 
-        if (laserBeam != null) {
-            if (laserBeam.isExpired()) {
-                laserBeam = null;
-            }
+        if (laserBeam != null && laserBeam.isExpired()) {
+            laserBeam = null;
         }
     }
 
     private void checkBallCollisions(Ball ball) {
 
         if (ball.checkCollision(paddle)) {
-            ball.bounceOffObject(paddle);
+            if (ball.getDy() > 0) {
+
+                ball.bounceOffObject(paddle);
+                ball.setY(paddle.getY() - ball.getHeight());
+
+                if (ball.getDy() >= 0) ball.setDy(-ball.getDy());
+                if (Math.abs(ball.getDy()) > BALL_START_SPEED) ball.setDy(-BALL_START_SPEED);
+            }
         }
 
         if (laserBeam != null) {
-            Iterator<Brick> laserBrickIterator = bricks.iterator();
-            while (laserBrickIterator.hasNext()) {
-                Brick brick = laserBrickIterator.next();
+            bricks.removeIf(brick -> {
                 if (!brick.isDestroyed() && laserBeam.checkCollision(brick)) {
-                    while (!brick.isDestroyed()) {
-                        brick.takeHit();
-                    }
+                    while (!brick.isDestroyed()) { brick.takeHit(); }
                     score += 10;
+                    return true;
                 }
-            }
-            bricks.removeIf(Brick::isDestroyed);
+                return false;
+            });
         }
 
         Iterator<Brick> brickIterator = bricks.iterator();
         while (brickIterator.hasNext()) {
             Brick brick = brickIterator.next();
             if (!brick.isDestroyed() && ball.checkCollision(brick)) {
-                ball.bounceOffObject(brick);
+
+                boolean hitVertical = ball.getDy() != 0;
+
+                if (hitVertical) {
+                    if (ball.getDy() > 0) ball.setY(brick.getY() - ball.getHeight());
+                    else ball.setY(brick.getY() + brick.getHeight());
+                    ball.setDy(-ball.getDy());
+                } else {
+                    if (ball.getDx() > 0) ball.setX(brick.getX() - ball.getWidth());
+                    else ball.setX(brick.getX() + brick.getWidth());
+                    ball.setDx(-ball.getDx());
+                }
+
                 brick.takeHit();
+
                 if (brick.isDestroyed()) {
                     score += 10;
 
-                    // THAY ĐỔI: Thêm kiểm tra viên gạch cuối cùng
-                    // Nếu số lượng gạch còn lại (trừ gạch hiện tại sắp bị xóa) bằng 0, thì không rơi Power-Up
                     if (bricks.size() > 1) {
                         Random rand = new Random();
                         if (rand.nextInt(100) < POWERUP_DROP_CHANCE) {
-                            int powerUpType = rand.nextInt(4);
-                            if (powerUpType == 0) {
-                                powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
-                            } else if (powerUpType == 1) {
-                                powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
-                            } else if (powerUpType == 2) {
-                                powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
-                            } else if (powerUpType == 3) {
-                                powerUps.add(new LaserPowerUp(brick.getX(), brick.getY(), 20, 20));
-                            }
+                            int type = rand.nextInt(4);
+                            if (type == 0) powerUps.add(new FastBallPowerUp(brick.getX(), brick.getY(), 20, 20, balls));
+                            else if (type == 1) powerUps.add(new ExpandPaddlePowerUp(brick.getX(), brick.getY(), 20, 20));
+                            else if (type == 2) powerUps.add(new Multiball(brick.getX(), brick.getY(), 20, 20, balls, 2));
+                            else if (type == 3) powerUps.add(new LaserPowerUp(brick.getX(), brick.getY(), 20, 20));
                         }
-                    } // Kết thúc kiểm tra Power-Up
-
+                    }
                     brickIterator.remove();
                 }
                 break;
@@ -273,14 +277,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     }
 
     private void checkPowerUpDuration() {
-        if (activePowerUp != null) {
-            if (!(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
-                if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.getDuration()) {
-                    if (!balls.isEmpty()) {
-                        activePowerUp.removeEffect(paddle, balls.get(0));
-                    }
-                    activePowerUp = null;
+        if (activePowerUp != null && !(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
+            if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.getDuration()) {
+                if (!balls.isEmpty()) {
+                    activePowerUp.removeEffect(paddle, balls.get(0));
                 }
+                activePowerUp = null;
             }
         }
     }
@@ -289,17 +291,18 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         if (bricks.isEmpty()) {
             levelManager.nextLevel();
             bricks = levelManager.createBricksForCurrentLevel();
+
             if (bricks.isEmpty()) {
                 gameState = "gameWin";
             } else {
                 balls.clear();
                 createStartingBall();
+
+                if (activePowerUp != null) activePowerUp.removeEffect(paddle, balls.get(0));
+                activePowerUp = null;
+
                 paddle.setActiveLaser(false);
                 laserBeam = null;
-                if (activePowerUp != null && !(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
-                    activePowerUp.removeEffect(paddle, balls.get(0));
-                    activePowerUp = null;
-                }
                 gameState = "ready";
             }
         }

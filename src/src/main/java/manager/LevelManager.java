@@ -19,7 +19,7 @@ public class LevelManager {
     public LevelManager(int gameWidth, int gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-        this.currentLevel = 5;
+        this.currentLevel = 1;
     }
 
     public List<Brick> createBricksForCurrentLevel() {

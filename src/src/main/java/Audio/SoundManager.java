@@ -3,15 +3,14 @@ package Audio;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Lớp SoundManager quản lý việc tải, lưu trữ và phát các clip âm thanh
- * trong trò chơi. Hỗ trợ tải từ hệ thống file (khi chạy trong IDE)
- * và từ bên trong file JAR (khi đóng gói game).
+ * trong trò chơi. Hỗ trợ tải từ Classpath (tài nguyên nội bộ/JAR)
+ * và fallback sang tìm kiếm file cục bộ đơn giản.
  */
 public class SoundManager {
     // Map để lưu trữ các Clip âm thanh đã được tải
@@ -19,7 +18,7 @@ public class SoundManager {
 
     /**
      * Tải một file âm thanh và lưu trữ nó dưới dạng Clip.
-     * @param soundPath Đường dẫn tương đối đến file âm thanh (vd: "assets/sound/music.wav").
+     * @param soundPath Đường dẫn tương đối đến file âm thanh (vd: "/sound/music.wav").
      */
     public void loadSound(String soundPath) {
         if (soundClips.containsKey(soundPath)) {
@@ -29,18 +28,25 @@ public class SoundManager {
         Clip clip = null;
         AudioInputStream audioStream = null;
 
+        // Bỏ qua các dòng DEBUG
+        // System.out.println("DEBUG: Đang tìm Classpath Resource: " + soundPath);
+
         try {
-            // 1. Thử tải file từ bên trong file JAR (tài nguyên nội bộ)
-            // Lấy URL tài nguyên. Đường dẫn phải bắt đầu bằng "/"
-            String resourcePath = "/" + soundPath.replace('\\', '/');
+            // 1. TẢI TỪ CLASSPATH (ƯU TIÊN TUYỆT ĐỐI)
+            // Đường dẫn phải bắt đầu bằng "/"
+            String resourcePath = "/" + soundPath.replace('\\', '/').replaceAll("^/+", "");
             URL url = SoundManager.class.getResource(resourcePath);
 
             if (url != null) {
-                // Tải thành công từ tài nguyên nội bộ (trong JAR)
+                // Tải thành công từ Classpath (trong IDE hoặc JAR)
                 audioStream = AudioSystem.getAudioInputStream(url);
             } else {
-                // 2. Thử tải file từ hệ thống file (khi chạy trong IDE)
-                File soundFile = new File(soundPath);
+                // 2. TẢI TỪ HỆ THỐNG FILE (FALLBACK ĐƠN GIẢN)
+
+                // Loại bỏ dấu '/' đầu tiên nếu có để dùng đường dẫn tương đối File I/O
+                String localPath = soundPath.startsWith("/") ? soundPath.substring(1) : soundPath;
+                File soundFile = new File(localPath);
+
                 if (soundFile.exists()) {
                     audioStream = AudioSystem.getAudioInputStream(soundFile);
                 } else {
@@ -112,7 +118,10 @@ public class SoundManager {
      */
     public void cleanup() {
         for (Clip clip : soundClips.values()) {
-            clip.close();
+            if (clip != null) {
+                clip.stop();
+                clip.close();
+            }
         }
         soundClips.clear();
         System.out.println("Đã dọn dẹp các tài nguyên âm thanh.");

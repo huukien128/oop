@@ -16,69 +16,105 @@ public class LevelManager {
     private int gameWidth;
     private int gameHeight;
 
-    public LevelManager(int gameWidth, int gameHeight) {
+    public LevelManager(int gameWidth, int integer) {
         this.gameWidth = gameWidth;
-        this.gameHeight = gameHeight;
+        this.gameHeight = integer;
         this.currentLevel = 1;
     }
 
     public List<Brick> createBricksForCurrentLevel() {
         List<Brick> bricks = new ArrayList<>();
-        List<String> levelMap = new ArrayList<>();
+        List<String> rawLevelMap = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream("/map/map.txt")))) {
 
             String line;
             boolean foundLevel = false;
+            int levelToLoad = Math.min(currentLevel, 10);
 
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
+                String trimmedLine = line.trim();
 
-                if (line.trim().equals("LEVEL" + currentLevel)) {
+                if (trimmedLine.isEmpty()) continue;
+
+                if (trimmedLine.equals("LEVEL" + levelToLoad)) {
                     foundLevel = true;
                     continue;
                 }
 
-                if (foundLevel && line.trim().startsWith("LEVEL")) {
+                if (foundLevel && trimmedLine.startsWith("LEVEL")) {
                     break;
                 }
 
                 if (foundLevel) {
-                    levelMap.add(line);
+                    rawLevelMap.add(line);
                 }
             }
 
         } catch (Exception e) {
+            System.err.println("Lỗi khi tải map level " + currentLevel);
             e.printStackTrace();
             return bricks;
         }
 
-        if (levelMap.isEmpty()) return bricks;
-
-        int spacing = 5;
-        int brickWidth = 50;
-        int brickHeight = 20;
-
-        int maxCols = 0;
-        for (String row : levelMap) {
-            if (row.length() > maxCols) maxCols = row.length();
+        if (rawLevelMap.isEmpty()) {
+            System.err.println("Không tìm thấy dữ liệu map cho LEVEL" + currentLevel + " trong file.");
+            return bricks;
         }
 
-        int totalMapWidth = maxCols * (brickWidth + spacing) - spacing;
-        int startX = (gameWidth - totalMapWidth) / 2;
+        // TÍNH TOÁN KÍCH THƯỚC VÀ VỊ TRÍ
+        int spacing = 4;
+        int brickWidth = 60;
+        int brickHeight = 20;
+
+        // 1. Tìm chiều dài hàng gạch HIỆU QUẢ dài nhất
+        int maxEffectiveCols = 0;
+        for (String row : rawLevelMap) {
+            // Chỉ cần lấy chiều dài của chuỗi sau khi trim (loại bỏ khoảng trắng thừa ở hai đầu)
+            if (row.trim().length() > maxEffectiveCols) {
+                maxEffectiveCols = row.trim().length();
+            }
+        }
+
+        // 2. Tính toán tổng chiều rộng bản đồ GẠCH HIỆU QUẢ
+        // Chiều rộng = Số gạch tối đa * (Chiều rộng gạch + Khoảng cách) - Khoảng cách cuối cùng
+        int totalMapWidth = maxEffectiveCols * (brickWidth + spacing) - spacing;
+
+        // 3. CÔNG THỨC CÂN CHỈNH CHÍNH XÁC
+        int startX = (gameWidth - 10 - totalMapWidth) / 2;
+
         int startY = 60;
 
-        for (int row = 0; row < levelMap.size(); row++) {
-            String rowStr = levelMap.get(row);
+        for (int row = 0; row < rawLevelMap.size(); row++) {
+            String rowStr = rawLevelMap.get(row);
 
-            for (int col = 0; col < rowStr.length(); col++) {
+            // Tìm chỉ mục bắt đầu của hàng gạch hiệu quả (chỉ số của ký tự gạch đầu tiên sau khoảng trắng)
+            int effectiveStartIndex = 0;
+            while(effectiveStartIndex < rowStr.length() && rowStr.charAt(effectiveStartIndex) == ' ') {
+                effectiveStartIndex++;
+            }
+
+            // Bỏ qua nếu hàng này toàn khoảng trắng
+            if (effectiveStartIndex == rowStr.length()) continue;
+
+            // Vị trí cột gạch hiện tại (chỉ tính ký tự gạch và khoảng cách giữa gạch)
+            int currentEffectiveCol = 0;
+
+            for (int col = effectiveStartIndex; col < rowStr.length(); col++) {
                 char c = rowStr.charAt(col);
-                if (c == ' ') continue;
 
-                int x = startX + col * (brickWidth + spacing);
+                if (c == ' ') {
+                    // Nếu gặp khoảng trắng giữa gạch, chúng ta vẫn tính nó là một "cột" (khoảng trống giữa gạch)
+                    currentEffectiveCol++;
+                    continue;
+                }
+
+                // Vị trí X: startX đã căn giữa + vị trí cột hiện tại * (chiều rộng + khoảng cách)
+                int x = startX + currentEffectiveCol * (brickWidth + spacing);
                 int y = startY + row * (brickHeight + spacing);
 
+                // Khởi tạo gạch
                 switch (c) {
                     case '1':
                         bricks.add(new NormalBrick(x, y, brickWidth, brickHeight, 1));
@@ -90,6 +126,9 @@ public class LevelManager {
                         bricks.add(new VeryStrongBrick(x, y, brickWidth, brickHeight, 3));
                         break;
                 }
+
+                // Tăng cột sau khi vẽ gạch
+                currentEffectiveCol++;
             }
         }
 
@@ -97,10 +136,21 @@ public class LevelManager {
     }
 
     public void nextLevel() {
-        currentLevel++;
+        if (currentLevel < 10) {
+            currentLevel++;
+        }
     }
 
     public int getCurrentLevel() {
         return currentLevel;
+    }
+
+    public void setCurrentLevel(int levelToSet) {
+        if (levelToSet >= 1 && levelToSet <= 10) {
+            this.currentLevel = levelToSet;
+        } else {
+            System.err.println("Lỗi: Level không hợp lệ (Phải từ 1 đến 10). Đặt mặc định là 1.");
+            this.currentLevel = 1;
+        }
     }
 }

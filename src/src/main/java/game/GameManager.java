@@ -21,6 +21,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
+import Audio.SoundManager;
 
 public class GameManager extends JPanel implements KeyListener, Runnable {
     public static final int GAME_WIDTH = 800;
@@ -51,6 +52,13 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
     private final int PADDLE_SPEED = 10;
     private final int BALL_START_SPEED = 2;
     private final int POWERUP_DROP_CHANCE = 30;
+    private SoundManager soundManager;
+
+    private final String MUSIC_PATH = "assets/sound/background_music.wav";
+    private final String LASER_PATH = "assets/sound/laser_shot.wav";
+    private final String HIT_PATH = "assets/sound/ball_hit.wav";
+    private final String LOSE_LIFE_PATH = "assets/sound/life_lost.wav";
+    private final String GAME_OVER_PATH = "assets/sound/game_over.wav";
 
     public GameManager() {
         try {
@@ -67,6 +75,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             System.err.println("Lỗi xử lý ảnh background: " + e.getMessage());
             e.printStackTrace();
         }
+
+        soundManager = new SoundManager();
+
+        soundManager.loadSound(MUSIC_PATH);
+        soundManager.loadSound(LASER_PATH);
+        soundManager.loadSound(HIT_PATH);
+        soundManager.loadSound(LOSE_LIFE_PATH);
+        soundManager.loadSound(GAME_OVER_PATH);
+
+        // BẮT ĐẦU PHÁT NHẠC NỀN
+        soundManager.playSound(MUSIC_PATH, true);
 
         initGame();
         setFocusable(true);
@@ -127,7 +146,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         if (paddle.getX() < 0) paddle.setX(0);
         else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) paddle.setX(GAME_WIDTH - paddle.getWidth());
 
-        handleLaserShot();
+        handleLaserShot(); // Đã được sửa để gọi âm thanh Laser bên trong
 
         Iterator<Ball> ballIterator = balls.iterator();
         while (ballIterator.hasNext()) {
@@ -147,7 +166,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 ball.setDy(-ball.getDy());
             }
 
-            checkBallCollisions(ball);
+            checkBallCollisions(ball); // Đã được sửa để gọi âm thanh HIT bên trong
 
             if (ball.getY() > GAME_HEIGHT) {
                 ballIterator.remove();
@@ -156,6 +175,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
         if (balls.isEmpty()) {
             lives--;
+            // THÊM: PHÁT ÂM THANH MẤT MẠNG
+            soundManager.playSound(LOSE_LIFE_PATH, false);
+
             if (lives > 0) {
                 createStartingBall();
 
@@ -168,6 +190,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 laserBeam = null;
                 gameState = "ready";
             } else {
+                soundManager.stopSound(MUSIC_PATH);
+                // THÊM: PHÁT ÂM THANH GAME OVER
+                soundManager.playSound(GAME_OVER_PATH, false);
                 gameState = "gameOver";
             }
         }
@@ -178,6 +203,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             pu.update();
 
             if (pu.checkCollision(paddle)) {
+                // THÊM: PHÁT ÂM THANH KHI ĂN POWER UP (Có thể dùng HIT_PATH hoặc tạo mới)
+                soundManager.playSound(HIT_PATH, false);
+
                 if (!balls.isEmpty()) {
                     Ball mainBall = balls.get(0);
 
@@ -195,7 +223,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         }
 
         checkPowerUpDuration();
-        checkGameOver();
+        checkGameOver(); // Đã được sửa để gọi âm thanh GAME OVER khi thắng
     }
 
     private void handleLaserShot() {
@@ -205,6 +233,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
                 int laserHeight = paddle.getY();
                 laserBeam = new LaserBeam(laserX, 0, LASER_WIDTH, laserHeight);
                 paddle.setActiveLaser(false);
+
+                // THÊM: PHÁT ÂM THANH BẮN LASER
+                soundManager.playSound(LASER_PATH, false);
             }
         }
 
@@ -223,12 +254,18 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
 
                 if (ball.getDy() >= 0) ball.setDy(-ball.getDy());
                 if (Math.abs(ball.getDy()) > BALL_START_SPEED) ball.setDy(-BALL_START_SPEED);
+
+                // THÊM: PHÁT ÂM THANH VA CHẠM (BALL -> PADDLE)
+                soundManager.playSound(HIT_PATH, false);
             }
         }
 
         if (laserBeam != null) {
             bricks.removeIf(brick -> {
                 if (!brick.isDestroyed() && laserBeam.checkCollision(brick)) {
+                    // THÊM: PHÁT ÂM THANH KHI LASER BẮN TRÚNG GẠCH
+                    soundManager.playSound(HIT_PATH, false);
+
                     while (!brick.isDestroyed()) { brick.takeHit(); }
                     score += 10;
                     return true;
@@ -241,6 +278,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
         while (brickIterator.hasNext()) {
             Brick brick = brickIterator.next();
             if (!brick.isDestroyed() && ball.checkCollision(brick)) {
+
+                // THÊM: PHÁT ÂM THANH VA CHẠM (BALL -> BRICK)
+                soundManager.playSound(HIT_PATH, false);
 
                 boolean hitVertical = ball.getDy() != 0;
 
@@ -293,10 +333,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable {
             bricks = levelManager.createBricksForCurrentLevel();
 
             if (bricks.isEmpty()) {
-                gameState = "gameWin";
+                soundManager.stopSound(MUSIC_PATH);
+                // THÊM: PHÁT ÂM THANH GAME OVER (KHI THẮNG)
+                soundManager.playSound(GAME_OVER_PATH, false); // Có thể thay bằng âm thanh WIN nếu có
+                gameState = "YOU WIN";
             } else {
                 balls.clear();
                 createStartingBall();
+
+                // THÊM: PHÁT LẠI NHẠC NỀN KHI CHUYỂN LEVEL
+                soundManager.playSound(MUSIC_PATH, true);
 
                 if (activePowerUp != null) activePowerUp.removeEffect(paddle, balls.get(0));
                 activePowerUp = null;

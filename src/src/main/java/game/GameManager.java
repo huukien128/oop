@@ -76,7 +76,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     private final int POWERUP_DROP_CHANCE = 30;
     private SoundManager soundManager;
 
-    // CẬP NHẬT ĐƯỜNG DẪN ÂM THANH MỚI (Lấy theo cấu hình đã thống nhất)
+    // ĐƯỜNG DẪN ÂM THANH GỐC (KHÔNG THAY ĐỔI)
     private final String MUSIC_PATH = "/sound/music.wav";
     private final String LASER_PATH = "/sound/electric.wav";
     private final String HIT_PATH = "/sound/recover.wav";
@@ -183,8 +183,36 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     }
 
     private void restartCurrentLevel() {
-        // Tương tự, bắt đầu Fade Out
-        startFadeOut(false);
+        // --- SỬA LỖI CHÍNH TẠI ĐÂY: Reset nhanh chóng ---
+
+        // 1. RESET PADDLE VÀ BALLS
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
+        balls.clear();
+        createStartingBall();
+
+        // 2. RESET POWERUPS VÀ EFFECT
+        powerUps.clear();
+        if (activePowerUp != null) {
+            // Loại bỏ hiệu ứng cũ
+            if (!balls.isEmpty()) activePowerUp.removeEffect(paddle, balls.get(0));
+            activePowerUp = null;
+        }
+        paddle.setActiveLaser(false);
+        laserBeam = null;
+
+
+        // 3. TẢI LẠI GẠCH và CHUYỂN NGAY VỀ TRẠNG THÁI READY
+        bricks = levelManager.createBricksForCurrentLevel();
+
+        gameState = MenuManager.STATE_READY;
+
+        // Đảm bảo không có Fade
+        isFadingOut = false;
+        isFadingIn = false;
+        fadeAlpha = 255;
+
+        if (isMuted) soundManager.stopSound(MUSIC_PATH);
+        else soundManager.playSound(MUSIC_PATH, true);
     }
 
     // PHƯƠNG THỨC CHUNG ĐỂ BẮT ĐẦU FADE OUT
@@ -204,15 +232,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                 fadeAlpha = 0;
                 isFadingOut = false;
 
-                // Reset vị trí paddle/ball và map
-                paddle.setX(GAME_WIDTH / 2 - paddle.getWidth() / 2);
-                paddle.setY(GAME_HEIGHT - 80);
+                // Reset vị trí paddle/ball VÀ TẢI LẠI MAP
+                paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
                 createStartingBall();
 
-                // Tải lại map cho level hiện tại (nếu cần, ví dụ khi restart)
-                if (bricks.isEmpty()) {
-                    bricks = levelManager.createBricksForCurrentLevel();
-                }
+                // Tải lại map cho level hiện tại
+                bricks = levelManager.createBricksForCurrentLevel();
 
                 isFadingIn = true;
             }
@@ -293,8 +318,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             lives--;
 
             if (lives > 0) {
-                // THAY ĐỔI: Bắt đầu Fade Out khi mất mạng
-                startFadeOut(true);
+                startFadeOut(true); // Bắt đầu Fade Out khi mất mạng
             } else {
                 // GAME OVER
                 soundManager.stopSound(MUSIC_PATH);
@@ -303,15 +327,13 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             }
         }
 
-        // ... (Logic PowerUp và kiểm tra Collision giữ nguyên) ...
         Iterator<PowerUp> powerUpIterator = powerUps.iterator();
         while (powerUpIterator.hasNext()) {
             PowerUp pu = powerUpIterator.next();
             pu.update();
 
             if (pu.checkCollision(paddle)) {
-                // CẬP NHẬT: Phát âm thanh PowerUp Pickup
-                if (!isMuted) soundManager.playSound(POWERUP_PICKUP_PATH, false);
+                if (!isMuted) soundManager.playSound(POWERUP_PICKUP_PATH, false); // Dùng âm thanh pickup
 
                 if (!balls.isEmpty()) {
                     Ball mainBall = balls.get(0);
@@ -486,6 +508,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fadeAlpha / 255f));
         }
 
+
         // 3. VẼ CÁC OBJECT TRÒ CHƠI
         if (!gameState.equals(MenuManager.STATE_MENU) || (gameState.equals(MenuManager.STATE_MENU) && menuScreen.equals(MenuManager.SCREEN_OPTIONS))) {
 
@@ -515,22 +538,13 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             }
 
 
-            // VẼ HUD
+            // Vẽ HUD
             if (!gameState.equals(MenuManager.STATE_MENU) && !gameState.equals(MenuManager.STATE_GAME_OVER) && !gameState.equals(MenuManager.STATE_GAME_WIN)) {
-
-                // THAY ĐỔI: Thiết lập màu trắng cho tất cả các thông số HUD
                 g2d.setColor(Color.WHITE);
-
-                // Score
                 g2d.drawString("Score: " + score, 10, 20);
-
-                // Lives
                 g2d.drawString("Lives: " + lives, 10, 40);
-
-                // Level
                 g2d.drawString("Level: " + levelManager.getCurrentLevel(), 10, 60);
 
-                // PowerUp Status
                 String puStatus = activePowerUp != null ? activePowerUp.getType() :
                         (paddle.isLaserReady() ? "Laser Pending" : "None");
                 g2d.drawString("PowerUp Active: " + puStatus, 10, 80);

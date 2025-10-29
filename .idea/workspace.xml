@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/manager/MenuManager.java" afterDir="false" />
+    <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="fix bug quả bóng và lam menu cho game">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/Audio/SoundManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/Audio/SoundManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/game/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/game/GameManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/manager/LevelManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/manager/LevelManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/Audio/SoundManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/Audio/SoundManager.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/game/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/game/GameManager.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +40,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/huukien128/oop.git&quot;,
-    &quot;accountId&quot;: &quot;5dd35dc4-1c6e-455c-a347-786dbb5528bf&quot;
+    &quot;accountId&quot;: &quot;af8e37b5-2afa-412b-9bf6-4c3afacc3d16&quot;
   },
   &quot;recentNewPullRequestHead&quot;: {
     &quot;server&quot;: {
@@ -196,7 +192,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761396670947</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="fix bug quả bóng và lam menu cho game">
+      <option name="closed" value="true" />
+      <created>1761676072622</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1761676072622</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -250,6 +254,7 @@
     <MESSAGE value="thêm class cài đồ họa" />
     <MESSAGE value="thêm đường dẫn ảnh cho các file" />
     <MESSAGE value="bổ sung" />
-    <option name="LAST_COMMIT_MESSAGE" value="bổ sung" />
+    <MESSAGE value="fix bug quả bóng và lam menu cho game" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug quả bóng và lam menu cho game" />
   </component>
 </project>

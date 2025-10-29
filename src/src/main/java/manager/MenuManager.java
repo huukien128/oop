@@ -139,7 +139,7 @@ public class MenuManager {
             g2d.setColor(Color.RED);
             g2d.drawString(getText("OVER_MSG", lang), gameWidth / 2 - g2d.getFontMetrics().stringWidth(getText("OVER_MSG", lang)) / 2, gameHeight / 2);
             g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            g2d.setColor(Color.WHITE);
+            g2d.setColor(Color.RED);
             g2d.drawString(getText("SCORE_FINAL", lang) + score, gameWidth / 2 - g2d.getFontMetrics().stringWidth(getText("SCORE_FINAL", lang) + score) / 2, gameHeight / 2 + 40);
             g2d.drawString(getText("RETURN_MENU", lang), gameWidth / 2 - g2d.getFontMetrics().stringWidth(getText("RETURN_MENU", lang)) / 2, gameHeight / 2 + 80);
             return;
@@ -147,7 +147,7 @@ public class MenuManager {
             g2d.setColor(Color.GREEN);
             g2d.drawString(getText("WIN_MSG", lang), gameWidth / 2 - g2d.getFontMetrics().stringWidth(getText("WIN_MSG", lang)) / 2, gameHeight / 2);
             g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            g2d.setColor(Color.WHITE);
+            g2d.setColor(Color.GREEN);
             g2d.drawString(getText("SCORE_FINAL", lang) + score, gameWidth / 2 - g2d.getFontMetrics().stringWidth(getText("SCORE_FINAL", lang) + score) / 2, gameHeight / 2 + 40);
             g2d.drawString(getText("RETURN_MENU", lang), gameWidth / 2 - g2d.getFontMetrics().stringWidth(getText("RETURN_MENU", lang)) / 2, gameHeight / 2 + 80);
             return;

@@ -236,7 +236,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                 paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
                 createStartingBall();
 
-                // Tải lại map cho level hiện tại
                 bricks = levelManager.createBricksForCurrentLevel();
 
                 isFadingIn = true;
@@ -449,7 +448,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                     brickIterator.remove();
                 }
 
-                // ĐIỂM SỬA CHỮA QUAN TRỌNG: Ngắt vòng lặp ngay sau khi va chạm với viên gạch đầu tiên.
                 break;
             }
         }
@@ -468,15 +466,17 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
 
     public void checkGameOver() {
         if (bricks.isEmpty()) {
-            levelManager.nextLevel();
-            // THAY ĐỔI: Sử dụng Fade cho chuyển màn
-            startFadeOut(false);
+            if (levelManager.getCurrentLevel() != 10) {
+                levelManager.nextLevel();
+                startFadeOut(false);
+            } else {
+                if (!isMuted) soundManager.stopSound(MUSIC_PATH);
 
-            // Xóa code reset cũ ở đây để tránh reset 2 lần:
-            /*
-            bricks = levelManager.createBricksForCurrentLevel();
-            if (bricks.isEmpty()) { ... } else { ... }
-            */
+                // Phát âm thanh Game Over (Sử dụng tạm lose.wav hoặc thay bằng file win nếu có)
+                if (!isMuted) soundManager.playSound(GAME_OVER_PATH, false);
+
+                gameState = MenuManager.STATE_GAME_WIN;
+            }
             return;
         }
     }

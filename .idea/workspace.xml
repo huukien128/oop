@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f96d6d3e-676d-4f94-890e-ff42bd6d4d88" name="Changes" comment="fix menu">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/manager/LevelManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/manager/LevelManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/resources/map/map.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/manager/LevelManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/manager/LevelManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/map/map.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/map/map.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/game/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/game/GameManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/game/GameManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/game/GameManager.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +72,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "local__Kien",
+    "git-widget-placeholder": "quang",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",

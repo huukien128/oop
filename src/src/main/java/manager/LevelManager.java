@@ -16,9 +16,9 @@ public class LevelManager {
     private int gameWidth;
     private int gameHeight;
 
-    public LevelManager(int gameWidth, int integer) {
+    public LevelManager(int gameWidth, int gameHeight) {
         this.gameWidth = gameWidth;
-        this.gameHeight = integer;
+        this.gameHeight = gameHeight;
         this.currentLevel = 1;
     }
 
@@ -68,44 +68,58 @@ public class LevelManager {
         int brickWidth = 60;
         int brickHeight = 20;
 
-        // 1. Tìm chiều dài hàng gạch HIỆU QUẢ dài nhất
+        // 1. TÌM CHỈ SỐ CỘT BẮT ĐẦU CỦA KHỐI GẠCH DÀI NHẤT TRONG LEVEL NÀY
         int maxEffectiveCols = 0;
+        int minGlobalIndex = Integer.MAX_VALUE;
+
         for (String row : rawLevelMap) {
-            // Chỉ cần lấy chiều dài của chuỗi sau khi trim (loại bỏ khoảng trắng thừa ở hai đầu)
-            if (row.trim().length() > maxEffectiveCols) {
-                maxEffectiveCols = row.trim().length();
+            String trimmedRow = row.trim();
+
+            // Tìm chiều dài hiệu quả của hàng (chỉ gạch + khoảng cách)
+            if (trimmedRow.length() > maxEffectiveCols) {
+                maxEffectiveCols = trimmedRow.length();
+            }
+
+            // Tìm chỉ số của ký tự không phải khoảng trắng ĐẦU TIÊN (lề trái)
+            int firstNonSpace = row.indexOf(trimmedRow.length() > 0 ? trimmedRow.charAt(0) : ' ');
+            if (firstNonSpace != -1) {
+                if (firstNonSpace < minGlobalIndex) {
+                    minGlobalIndex = firstNonSpace;
+                }
             }
         }
 
-        // 2. Tính toán tổng chiều rộng bản đồ GẠCH HIỆU QUẢ
-        // Chiều rộng = Số gạch tối đa * (Chiều rộng gạch + Khoảng cách) - Khoảng cách cuối cùng
+        if (minGlobalIndex == Integer.MAX_VALUE) minGlobalIndex = 0; // Tránh lỗi nếu map toàn khoảng trắng
+
+        // 2. TÍNH TOÁN VỊ TRÍ X BẮT ĐẦU VÀ BÙ TRỪ
+
+        // Tổng chiều rộng bản đồ gạch
         int totalMapWidth = maxEffectiveCols * (brickWidth + spacing) - spacing;
 
-        // 3. CÔNG THỨC CÂN CHỈNH CHÍNH XÁC
-        int startX = (gameWidth - 10 - totalMapWidth) / 2;
+        // Vị trí X TÍNH TOÁN ĐỂ CĂN GIỮA
+        int startX_Centered = (gameWidth - 10 - totalMapWidth) / 2;
+
+        // Vị trí X thực tế (Bù trừ lề trái của hàng gạch dài nhất)
+        // Lỗi lệch phải xảy ra vì startX_Centered là vị trí ký tự đầu tiên,
+        // nhưng nếu map có lề trái, ta cần bỏ qua lề đó.
+        // Tuy nhiên, logic này phức tạp do file map có thể không đồng nhất.
+
+        // ĐƠN GIẢN HÓA: Dùng startX_Centered và xóa trim()
+        int startX = startX_Centered;
 
         int startY = 60;
 
         for (int row = 0; row < rawLevelMap.size(); row++) {
             String rowStr = rawLevelMap.get(row);
 
-            // Tìm chỉ mục bắt đầu của hàng gạch hiệu quả (chỉ số của ký tự gạch đầu tiên sau khoảng trắng)
-            int effectiveStartIndex = 0;
-            while(effectiveStartIndex < rowStr.length() && rowStr.charAt(effectiveStartIndex) == ' ') {
-                effectiveStartIndex++;
-            }
-
-            // Bỏ qua nếu hàng này toàn khoảng trắng
-            if (effectiveStartIndex == rowStr.length()) continue;
-
-            // Vị trí cột gạch hiện tại (chỉ tính ký tự gạch và khoảng cách giữa gạch)
+            // Bỏ qua khoảng trắng ở lề trái của hàng hiện tại
             int currentEffectiveCol = 0;
+            int currentX = startX;
 
-            for (int col = effectiveStartIndex; col < rowStr.length(); col++) {
+            for (int col = 0; col < rowStr.length(); col++) {
                 char c = rowStr.charAt(col);
 
                 if (c == ' ') {
-                    // Nếu gặp khoảng trắng giữa gạch, chúng ta vẫn tính nó là một "cột" (khoảng trống giữa gạch)
                     currentEffectiveCol++;
                     continue;
                 }
@@ -127,7 +141,6 @@ public class LevelManager {
                         break;
                 }
 
-                // Tăng cột sau khi vẽ gạch
                 currentEffectiveCol++;
             }
         }

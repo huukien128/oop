@@ -10,18 +10,34 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lớp LevelManager quản lý việc tải và xây dựng cấu trúc gạch (bricks)
+ * cho mỗi cấp độ từ file map.txt, đồng thời quản lý cấp độ hiện tại của trò chơi.
+ */
 public class LevelManager {
 
     private int currentLevel;
     private int gameWidth;
     private int gameHeight;
 
+    /**
+     * Khởi tạo LevelManager với kích thước màn hình game.
+     * Cấp độ ban đầu được đặt là 1.
+     * @param gameWidth Chiều rộng của khu vực chơi.
+     * @param gameHeight Chiều cao của khu vực chơi.
+     */
     public LevelManager(int gameWidth, int gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
         this.currentLevel = 1;
     }
 
+    /**
+     * Tạo danh sách gạch (Brick) dựa trên cấu trúc của cấp độ hiện tại.
+     * Phương thức này đọc file map.txt, tìm đến phần LEVELx tương ứng,
+     * và tính toán vị trí, loại gạch để căn giữa trên màn hình.
+     * @return Danh sách các đối tượng Brick cho cấp độ hiện tại.
+     */
     public List<Brick> createBricksForCurrentLevel() {
         List<Brick> bricks = new ArrayList<>();
         List<String> rawLevelMap = new ArrayList<>();
@@ -63,24 +79,20 @@ public class LevelManager {
             return bricks;
         }
 
-        // TÍNH TOÁN KÍCH THƯỚC VÀ VỊ TRÍ
         int spacing = 4;
         int brickWidth = 60;
         int brickHeight = 20;
 
-        // 1. TÌM CHỈ SỐ CỘT BẮT ĐẦU CỦA KHỐI GẠCH DÀI NHẤT TRONG LEVEL NÀY
         int maxEffectiveCols = 0;
         int minGlobalIndex = Integer.MAX_VALUE;
 
         for (String row : rawLevelMap) {
             String trimmedRow = row.trim();
 
-            // Tìm chiều dài hiệu quả của hàng (chỉ gạch + khoảng cách)
             if (trimmedRow.length() > maxEffectiveCols) {
                 maxEffectiveCols = trimmedRow.length();
             }
 
-            // Tìm chỉ số của ký tự không phải khoảng trắng ĐẦU TIÊN (lề trái)
             int firstNonSpace = row.indexOf(trimmedRow.length() > 0 ? trimmedRow.charAt(0) : ' ');
             if (firstNonSpace != -1) {
                 if (firstNonSpace < minGlobalIndex) {
@@ -89,22 +101,12 @@ public class LevelManager {
             }
         }
 
-        if (minGlobalIndex == Integer.MAX_VALUE) minGlobalIndex = 0; // Tránh lỗi nếu map toàn khoảng trắng
+        if (minGlobalIndex == Integer.MAX_VALUE) minGlobalIndex = 0;
 
-        // 2. TÍNH TOÁN VỊ TRÍ X BẮT ĐẦU VÀ BÙ TRỪ
-
-        // Tổng chiều rộng bản đồ gạch
         int totalMapWidth = maxEffectiveCols * (brickWidth + spacing) - spacing;
 
-        // Vị trí X TÍNH TOÁN ĐỂ CĂN GIỮA
         int startX_Centered = (gameWidth - 10 - totalMapWidth) / 2;
 
-        // Vị trí X thực tế (Bù trừ lề trái của hàng gạch dài nhất)
-        // Lỗi lệch phải xảy ra vì startX_Centered là vị trí ký tự đầu tiên,
-        // nhưng nếu map có lề trái, ta cần bỏ qua lề đó.
-        // Tuy nhiên, logic này phức tạp do file map có thể không đồng nhất.
-
-        // ĐƠN GIẢN HÓA: Dùng startX_Centered và xóa trim()
         int startX = startX_Centered;
 
         int startY = 60;
@@ -112,9 +114,7 @@ public class LevelManager {
         for (int row = 0; row < rawLevelMap.size(); row++) {
             String rowStr = rawLevelMap.get(row);
 
-            // Bỏ qua khoảng trắng ở lề trái của hàng hiện tại
             int currentEffectiveCol = 0;
-            int currentX = startX;
 
             for (int col = 0; col < rowStr.length(); col++) {
                 char c = rowStr.charAt(col);
@@ -124,11 +124,9 @@ public class LevelManager {
                     continue;
                 }
 
-                // Vị trí X: startX đã căn giữa + vị trí cột hiện tại * (chiều rộng + khoảng cách)
                 int x = startX + currentEffectiveCol * (brickWidth + spacing);
                 int y = startY + row * (brickHeight + spacing);
 
-                // Khởi tạo gạch
                 switch (c) {
                     case '1':
                         bricks.add(new NormalBrick(x, y, brickWidth, brickHeight, 1));
@@ -148,16 +146,27 @@ public class LevelManager {
         return bricks;
     }
 
+    /**
+     * Tăng cấp độ hiện tại lên 1, tối đa là level 10.
+     */
     public void nextLevel() {
         if (currentLevel < 10) {
             currentLevel++;
         }
     }
 
+    /**
+     * Lấy cấp độ hiện tại của trò chơi.
+     * @return Cấp độ hiện tại (từ 1 đến 10).
+     */
     public int getCurrentLevel() {
         return currentLevel;
     }
 
+    /**
+     * Đặt cấp độ hiện tại của trò chơi.
+     * @param levelToSet Cấp độ muốn đặt (phải từ 1 đến 10).
+     */
     public void setCurrentLevel(int levelToSet) {
         if (levelToSet >= 1 && levelToSet <= 10) {
             this.currentLevel = levelToSet;

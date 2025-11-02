@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.SwingUtilities;
 
+/**
+ * Quản lý và vẽ tất cả các màn hình menu và trạng thái hiển thị của game.
+ */
 public class MenuManager {
 
-    // --- Hằng số Trạng thái Game ---
     public static final String STATE_MENU = "menu";
     public static final String STATE_READY = "ready";
     public static final String STATE_PAUSED = "paused";
@@ -16,14 +18,12 @@ public class MenuManager {
     public static final String STATE_GAME_OVER = "gameOver";
     public static final String STATE_GAME_WIN = "gameWin";
 
-    // --- Hằng số Màn hình Menu ---
     public static final String SCREEN_MAIN = "main";
     public static final String SCREEN_PAUSE = "pause";
     public static final String SCREEN_OPTIONS = "options";
     public static final String SCREEN_CREDITS = "credits";
     public static final String SCREEN_LEVEL_SELECT = "levelSelect";
 
-    // --- Hằng số Mục Menu Chính ---
     public static final int MAIN_START = 0;
     public static final int MAIN_LEVEL_SELECT = 1;
     public static final int MAIN_OPTIONS = 2;
@@ -31,12 +31,10 @@ public class MenuManager {
     public static final int MAIN_EXIT = 4;
     public static final int MAIN_ITEMS_COUNT = 5;
 
-    // --- Hằng số Level Select ---
     public static final int MAX_LEVEL = 10;
     public static final int LEVEL_BACK = MAX_LEVEL;
     public static final int LEVEL_ITEMS_COUNT = MAX_LEVEL + 1;
 
-    // --- Hằng số Menu Tạm Dừng và Cài đặt ---
     public static final int PAUSE_RESUME = 0;
     public static final int PAUSE_RESTART = 1;
     public static final int PAUSE_MAIN_MENU = 2;
@@ -47,11 +45,12 @@ public class MenuManager {
     public static final int OPTIONS_BACK = 2;
     public static final int OPTIONS_ITEMS_COUNT = 3;
 
-    // --- LOGIC ĐA NGÔN NGỮ ---
     private final Map<String, Map<String, String>> texts = new HashMap<>();
 
+    /**
+     * Khởi tạo MenuManager và tải các chuỗi văn bản đa ngôn ngữ.
+     */
     public MenuManager() {
-        // Khởi tạo các chuỗi tiếng Anh (EN)
         Map<String, String> en = new HashMap<>();
         en.put("GAME_TITLE", "JAVA BREAKOUT");
         en.put("READY_MSG", "PRESS SPACE TO LAUNCH BALL");
@@ -82,7 +81,6 @@ public class MenuManager {
 
         texts.put("EN", en);
 
-        // Khởi tạo các chuỗi tiếng Việt (VI)
         Map<String, String> vi = new HashMap<>();
         vi.put("GAME_TITLE", "GAME PHÁ GẠCH");
         vi.put("READY_MSG", "NHẤN SPACE ĐỂ BẮN BÓNG");
@@ -114,20 +112,37 @@ public class MenuManager {
         texts.put("VI", vi);
     }
 
+    /**
+     * Lấy chuỗi văn bản dựa trên key và ngôn ngữ được chọn.
+     * Mặc định trả về Tiếng Anh hoặc key nếu không tìm thấy.
+     *
+     * @param key Mã chuỗi cần lấy.
+     * @param lang Mã ngôn ngữ (ví dụ: "EN", "VI").
+     * @return Chuỗi văn bản đã được bản địa hóa.
+     */
     public String getText(String key, String lang) {
         return texts.getOrDefault(lang, texts.get("EN")).getOrDefault(key, key);
     }
 
+    /**
+     * Vẽ màn hình menu tương ứng dựa trên trạng thái game và màn hình menu hiện tại.
+     *
+     * @param g2d Đối tượng Graphics2D để vẽ.
+     * @param gameState Trạng thái game hiện tại.
+     * @param menuScreen Màn hình menu hiện tại (khi đang ở trạng thái menu hoặc tạm dừng).
+     * @param score Điểm số hiện tại.
+     * @param selectedItem Chỉ mục của mục menu đang được chọn.
+     * @param currentLevel Level hiện tại của game.
+     * @param isMuted Trạng thái âm thanh (True nếu tắt tiếng).
+     * @param currentLanguage Ngôn ngữ hiện tại.
+     */
     public void drawMenuScreen(Graphics2D g2d, String gameState, String menuScreen, int score, int selectedItem, int currentLevel, boolean isMuted, String currentLanguage) {
 
-        // Cài đặt chung
         int gameWidth = GameManager.GAME_WIDTH;
         int gameHeight = GameManager.GAME_HEIGHT;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setFont(new Font("Arial", Font.BOLD, 30));
         String lang = currentLanguage.toUpperCase();
-
-        // ... [Logic vẽ READY/OVER/WIN giữ nguyên] ...
 
         if (gameState.equals(STATE_READY)) {
             g2d.setColor(Color.WHITE);
@@ -153,7 +168,6 @@ public class MenuManager {
             return;
         }
 
-        // --- CÁC MÀN HÌNH CÓ LIST MENU HOẶC MÀN HÌNH THÔNG TIN ---
         if (gameState.equals(STATE_MENU) || gameState.equals(STATE_PAUSED)) {
 
             String title = "";
@@ -197,7 +211,6 @@ public class MenuManager {
                 };
                 itemsCount = OPTIONS_ITEMS_COUNT;
             } else if (menuScreen.equals(SCREEN_CREDITS)) {
-                // Xử lý Credits/Truyền thuyết UET Rút gọn
                 g2d.setFont(new Font("Arial", Font.BOLD, 30));
                 g2d.setColor(Color.YELLOW);
 
@@ -237,23 +250,19 @@ public class MenuManager {
                 return;
             }
 
-            // --- Logic vẽ Menu List chung ---
             g2d.setFont(new Font("Arial", Font.BOLD, 30));
             g2d.setColor(Color.YELLOW);
             g2d.drawString(title, gameWidth / 2 - g2d.getFontMetrics().stringWidth(title) / 2, gameHeight / 2 - 150);
 
             g2d.setFont(new Font("Arial", Font.BOLD, 22));
 
-            // CÂN CHỈNH VỊ TRÍ
             int startY = gameHeight / 2 - 80;
-            int lineHeight = 45; // Tăng nhẹ để có khoảng cách giữa các nút
+            int lineHeight = 45;
             FontMetrics fm = g2d.getFontMetrics();
 
-            // Vòng lặp vẽ Menu List (Chạy cho tất cả các Menu List)
             if (menuScreen.equals(SCREEN_LEVEL_SELECT)) {
 
-                // --- LOGIC VẼ 2 CỘT CHO LEVEL SELECT VÀ VIỀN 3D ---
-                int half = MAX_LEVEL / 2; // 5
+                int half = MAX_LEVEL / 2;
                 int col1X = gameWidth / 2 - 150;
                 int col2X = gameWidth / 2 + 50;
                 int rectWidth = 140;
@@ -265,58 +274,54 @@ public class MenuManager {
                     int itemY;
                     int finalRectWidth = rectWidth;
 
-                    // Xác định vị trí X, Y và độ rộng cho nút BACK
                     if (i < half) {
                         x = col1X;
                         itemY = startY + i * lineHeight;
                     } else if (i < MAX_LEVEL) {
                         x = col2X;
                         itemY = startY + (i - half) * lineHeight;
-                    } else { // Mục BACK (Luôn ở dưới cùng)
+                    } else {
                         itemY = startY + half * lineHeight + 50;
-                        finalRectWidth = 280; // Nút BACK full width chuẩn
+                        finalRectWidth = 280;
                         x = gameWidth / 2 - finalRectWidth / 2;
                     }
 
                     int rectX = x;
                     int rectY = itemY - fm.getAscent() - 5;
 
-                    // VẼ NÚT
                     if (i == selectedItem) {
-                        g2d.setColor(new Color(255, 100, 100, 255)); // Màu nền highlight MÀU ĐẶC
+                        g2d.setColor(new Color(255, 100, 100, 255));
                         g2d.fillRoundRect(rectX, rectY, finalRectWidth, rectHeight, 10, 10);
 
-                        g2d.setColor(new Color(255, 255, 255)); // Viền ngoài (Highlight)
+                        g2d.setColor(new Color(255, 255, 255));
                         g2d.setStroke(new BasicStroke(2.5f));
                         g2d.drawRoundRect(rectX, rectY, finalRectWidth, rectHeight, 10, 10);
 
-                        g2d.setColor(Color.BLACK); // Chữ đen
+                        g2d.setColor(Color.BLACK);
                     } else {
-                        g2d.setColor(new Color(50, 50, 50, 200)); // Màu nền tối mờ
+                        g2d.setColor(new Color(50, 50, 50, 200));
                         g2d.fillRoundRect(rectX, rectY, finalRectWidth, rectHeight, 10, 10);
 
-                        g2d.setColor(new Color(150, 150, 150, 255)); // Viền ngoài (Shadow)
+                        g2d.setColor(new Color(150, 150, 150, 255));
                         g2d.setStroke(new BasicStroke(1.5f));
                         g2d.drawRoundRect(rectX, rectY, finalRectWidth, rectHeight, 10, 10);
 
-                        g2d.setColor(Color.WHITE); // Chữ trắng
+                        g2d.setColor(Color.WHITE);
                     }
 
-                    // VẼ CHỮ
                     int textX;
-                    if (i < MAX_LEVEL) { // Căn giữa chữ trên nút Level 1-10
+                    if (i < MAX_LEVEL) {
                         textX = rectX + (finalRectWidth - fm.stringWidth(item)) / 2;
-                    } else { // Căn giữa chữ trên nút BACK
+                    } else {
                         textX = rectX + (finalRectWidth - fm.stringWidth(item)) / 2;
                     }
 
                     g2d.drawString(item, textX, itemY);
-                    g2d.setStroke(new BasicStroke(1)); // Đặt lại stroke
+                    g2d.setStroke(new BasicStroke(1));
                 }
 
             } else {
-                // Logic vẽ Menu List một cột (MAIN, PAUSE, OPTIONS)
-                final int BUTTON_STD_WIDTH = 280; // Chiều rộng chuẩn của nút
+                final int BUTTON_STD_WIDTH = 280;
 
                 for (int i = 0; i < itemsCount; i++) {
                     String item = menuItems[i];
@@ -329,7 +334,6 @@ public class MenuManager {
                     int rectX = gameWidth / 2 - rectWidth / 2;
                     int rectY = itemY - fm.getAscent() - 5;
 
-                    // VẼ NÚT
                     if (i == selectedItem) {
                         g2d.setColor(new Color(255, 100, 100, 255));
                         g2d.fillRoundRect(rectX, rectY, rectWidth, rectHeight, 10, 10);
@@ -347,7 +351,6 @@ public class MenuManager {
                         g2d.setColor(Color.WHITE);
                     }
 
-                    // VẼ CHỮ
                     int textX = rectX + (rectWidth - textWidth) / 2;
                     g2d.drawString(item, textX, itemY);
                     g2d.setStroke(new BasicStroke(1));

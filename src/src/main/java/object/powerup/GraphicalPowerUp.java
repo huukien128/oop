@@ -10,17 +10,34 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Lớp trừu tượng GraphicalPowerUp mở rộng PowerUp, chịu trách nhiệm quản lý và hiển thị
+ * hình ảnh (texture) cho các vật phẩm power-up.
+ */
 public abstract class GraphicalPowerUp extends PowerUp {
 
-    protected BufferedImage powerUpImage;
-    protected String imagePath;
+    private BufferedImage powerUpImage;
+    private String imagePath;
 
+    /**
+     * Khởi tạo GraphicalPowerUp.
+     * @param x Tọa độ X.
+     * @param y Tọa độ Y.
+     * @param width Chiều rộng.
+     * @param height Chiều cao.
+     * @param type Loại PowerUp.
+     * @param duration Thời gian hiệu lực (miligiây).
+     * @param imagePath Đường dẫn đến hình ảnh PowerUp.
+     */
     public GraphicalPowerUp(int x, int y, int width, int height, String type, int duration, String imagePath) {
         super(x, y, width, height, type, duration);
         this.imagePath = imagePath;
         loadImage();
     }
 
+    /**
+     * Tải hình ảnh (BufferedImage) từ đường dẫn tài nguyên đã cung cấp (imagePath).
+     */
     private void loadImage() {
         try (InputStream is = getClass().getResourceAsStream(imagePath)) {
             if (is != null) {
@@ -33,10 +50,14 @@ public abstract class GraphicalPowerUp extends PowerUp {
         }
     }
 
+    /**
+     * Vẽ PowerUp lên màn hình. Ưu tiên vẽ bằng hình ảnh, nếu không tải được thì vẽ bằng hình tròn magenta.
+     * @param g Đối tượng Graphics để vẽ.
+     * @see object.GameObject#render(Graphics)
+     */
     @Override
     public void render(Graphics g) {
         if (powerUpImage != null) {
-            // Vẽ ảnh
             g.drawImage(powerUpImage, getX(), getY(), getWidth(), getHeight(), null);
         } else {
             g.setColor(Color.MAGENTA);
@@ -45,5 +66,4 @@ public abstract class GraphicalPowerUp extends PowerUp {
             g.drawString(getType().substring(0, 1), getX() + 5, getY() + 15);
         }
     }
-
 }

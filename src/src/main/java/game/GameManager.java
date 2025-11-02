@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.awt.image.BufferedImage;
 import Audio.SoundManager;
 
+/**
+ * Lớp GameManager quản lý logic cốt lõi, vòng lặp trò chơi, đối tượng game (paddle, balls, bricks, power-ups),
+ * trạng thái game (menu, playing, paused, game over), và xử lý input.
+ */
 public class GameManager extends JPanel implements KeyListener, Runnable, MouseListener {
     public static final int GAME_WIDTH = 800;
     public static final int GAME_HEIGHT = 600;
@@ -33,9 +37,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
 
     private static final int COLLISION_WIDTH = GAME_WIDTH - 10;
 
-    // QUẢN LÝ ĐƯỜNG DẪN HÌNH ẢNH
     private static final String BACKGROUND_IMAGE_PATH = "/images/background.png";
-    private static final String MAIN_MENU_IMAGE_PATH = "/images/menu_main_bg.png"; // ẢNH MENU CHÍNH
+    private static final String MAIN_MENU_IMAGE_PATH = "/images/menu_main_bg.png";
 
     private final int LASER_SHOT_DELAY = 1000;
     private final int LASER_WIDTH = 20;
@@ -57,26 +60,28 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
 
     private LevelManager levelManager;
     private BufferedImage backgroundImage;
-    private BufferedImage mainMenuImage; // BIẾN LƯU ẢNH MENU CHÍNH
+    private BufferedImage mainMenuImage;
     private MenuManager menuManager;
 
     private int selectedMenuItem;
     private boolean isMuted;
     private String currentLanguage;
 
-    // BIẾN HIỆU ỨNG FADE
     private int fadeAlpha = 255;
     private boolean isFadingOut = false;
     private boolean isFadingIn = false;
-    private final int FADE_SPEED = 10; // Tốc độ fade (alpha steps)
+    private final int FADE_SPEED = 10;
 
+    /**
+     * Cờ để xác định việc fade out là do mất mạng (true: giữ nguyên gạch) hay chuyển level (false: tải lại gạch).
+     */
+    private boolean isLifeLostFade = false;
 
     private final int PADDLE_SPEED = 10;
     private final int BALL_START_SPEED = 2;
     private final int POWERUP_DROP_CHANCE = 30;
     private SoundManager soundManager;
 
-    // ĐƯỜNG DẪN ÂM THANH GỐC (KHÔNG THAY ĐỔI)
     private final String MUSIC_PATH = "/sound/music.wav";
     private final String LASER_PATH = "/sound/electric.wav";
     private final String HIT_PATH = "/sound/recover.wav";
@@ -84,9 +89,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     private final String GAME_OVER_PATH = "/sound/lose.wav";
     private final String POWERUP_PICKUP_PATH = "/sound/powerup.wav";
 
+    /**
+     * Khởi tạo GameManager, tải tài nguyên, thiết lập quản lý âm thanh và menu.
+     */
     public GameManager() {
         try {
-            // Tải background game chính
             InputStream is = getClass().getResourceAsStream(BACKGROUND_IMAGE_PATH);
             if (is != null) {
                 backgroundImage = ImageIO.read(is);
@@ -95,7 +102,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                 System.err.println("LỖI: Không tìm thấy tệp " + BACKGROUND_IMAGE_PATH);
             }
 
-            // Tải ảnh Menu Chính
             is = getClass().getResourceAsStream(MAIN_MENU_IMAGE_PATH);
             if (is != null) {
                 mainMenuImage = ImageIO.read(is);
@@ -123,7 +129,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         soundManager.loadSound(HIT_PATH);
         soundManager.loadSound(LOSE_LIFE_PATH);
         soundManager.loadSound(GAME_OVER_PATH);
-        soundManager.loadSound(POWERUP_PICKUP_PATH); // Tải âm thanh mới
+        soundManager.loadSound(POWERUP_PICKUP_PATH);
 
         if (!isMuted) soundManager.playSound(MUSIC_PATH, true);
 
@@ -134,137 +140,101 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
     }
 
-    private void createStartingBall() {
-        Ball newBall = new Ball(
-                paddle.getX() + (paddle.getWidth() / 2 - 10),
-                paddle.getY() - 20,
-                15, 15,
-                BALL_START_SPEED,
-                0, 0
-        );
-        balls.add(newBall);
-    }
-
-    private void initGame() {
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
-        balls = new ArrayList<>();
-
-        createStartingBall();
-
-        powerUps = new ArrayList<>();
-        score = 0;
-        lives = 3;
-
-        gameState = MenuManager.STATE_MENU;
-
-        if (levelManager == null) {
-            levelManager = new LevelManager(GAME_WIDTH, GAME_HEIGHT);
-        }
-        bricks = levelManager.createBricksForCurrentLevel();
-
-        menuScreen = MenuManager.SCREEN_MAIN;
-        selectedMenuItem = MenuManager.MAIN_START;
-    }
-
-    private void resetGameForPlay() {
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
-        balls = new ArrayList<>();
-        createStartingBall();
-        powerUps = new ArrayList<>();
-        score = 0;
-        lives = 3;
-
-        bricks = levelManager.createBricksForCurrentLevel();
-
-        // Bắt đầu màn chơi từ Menu chính -> Cần Fade In
-        isFadingIn = true;
-        fadeAlpha = 0;
-        gameState = MenuManager.STATE_PLAYING; // Sẽ chuyển sang READY sau fade in
-    }
-
-    private void restartCurrentLevel() {
-        // --- SỬA LỖI CHÍNH TẠI ĐÂY: Reset nhanh chóng ---
-
-        // 1. RESET PADDLE VÀ BALLS
-        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
-        balls.clear();
-        createStartingBall();
-
-        // 2. RESET POWERUPS VÀ EFFECT
-        powerUps.clear();
-        if (activePowerUp != null) {
-            // Loại bỏ hiệu ứng cũ
-            if (!balls.isEmpty()) activePowerUp.removeEffect(paddle, balls.get(0));
-            activePowerUp = null;
-        }
-        paddle.setActiveLaser(false);
-        laserBeam = null;
-
-
-        // 3. TẢI LẠI GẠCH và CHUYỂN NGAY VỀ TRẠNG THÁI READY
-        bricks = levelManager.createBricksForCurrentLevel();
-
-        gameState = MenuManager.STATE_READY;
-
-        // Đảm bảo không có Fade
-        isFadingOut = false;
-        isFadingIn = false;
-        fadeAlpha = 255;
-
-        if (isMuted) soundManager.stopSound(MUSIC_PATH);
-        else soundManager.playSound(MUSIC_PATH, true);
-    }
-
-    // PHƯƠNG THỨC CHUNG ĐỂ BẮT ĐẦU FADE OUT
-    private void startFadeOut(boolean isLifeLost) {
-        if (isLifeLost) {
-            if (!isMuted) soundManager.playSound(LOSE_LIFE_PATH, false);
-        }
-        isFadingOut = true;
-        fadeAlpha = 255;
-        balls.clear();
-    }
-
-    private void handleFadeEffect() {
-        if (isFadingOut) {
-            fadeAlpha -= FADE_SPEED;
-            if (fadeAlpha <= 0) {
-                fadeAlpha = 0;
-                isFadingOut = false;
-
-                // Reset vị trí paddle/ball VÀ TẢI LẠI MAP
-                paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
-                createStartingBall();
-
-                bricks = levelManager.createBricksForCurrentLevel();
-
-                isFadingIn = true;
-            }
-        } else if (isFadingIn) {
-            fadeAlpha += FADE_SPEED;
-            if (fadeAlpha >= 255) {
-                fadeAlpha = 255;
-                isFadingIn = false;
-                gameState = MenuManager.STATE_READY; // Sẵn sàng chơi lại
-            }
-        }
-    }
-
-
+    /**
+     * Khởi động vòng lặp game trên một luồng riêng.
+     */
     public void startGame() {
         Thread gameThread = new Thread(this);
         gameThread.start();
     }
 
+    /**
+     * Vẽ tất cả các thành phần trò chơi và giao diện người dùng.
+     * @param g Đối tượng Graphics để vẽ.
+     */
+    public void draw(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+        if (gameState.equals(MenuManager.STATE_MENU) && menuScreen.equals(MenuManager.SCREEN_MAIN) && mainMenuImage != null) {
+            g2d.drawImage(mainMenuImage, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
+        } else if (backgroundImage != null) {
+            g2d.drawImage(backgroundImage, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
+        } else {
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        }
+
+        if (isFadingIn || isFadingOut) {
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fadeAlpha / 255f));
+        }
+
+
+        if (!gameState.equals(MenuManager.STATE_MENU) || (gameState.equals(MenuManager.STATE_MENU) && menuScreen.equals(MenuManager.SCREEN_OPTIONS))) {
+
+            paddle.render(g2d);
+
+            if (!isFadingOut) {
+                for (Ball ball : balls) {
+                    ball.render(g2d);
+                }
+            }
+
+            for (Brick brick : bricks) {
+                brick.render(g2d);
+            }
+            for (PowerUp pu : powerUps) {
+                pu.render(g2d);
+            }
+
+            if (laserBeam != null) {
+                laserBeam.render(g2d);
+            }
+
+            if (isFadingIn || isFadingOut) {
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+            }
+
+
+            // Vẽ HUD
+            if (!gameState.equals(MenuManager.STATE_MENU) && !gameState.equals(MenuManager.STATE_GAME_OVER) && !gameState.equals(MenuManager.STATE_GAME_WIN)) {
+                g2d.setColor(Color.WHITE);
+                g2d.drawString("Score: " + score, 10, 20);
+                g2d.drawString("Lives: " + lives, 10, 40);
+                g2d.drawString("Level: " + levelManager.getCurrentLevel(), 10, 60);
+
+                String puStatus = activePowerUp != null ? activePowerUp.getType() :
+                        (paddle.isLaserReady() ? "Laser Pending" : "None");
+                g2d.drawString("PowerUp Active: " + puStatus, 10, 80);
+            }
+        }
+
+        if (gameState.equals(MenuManager.STATE_PAUSED) ||
+                (gameState.equals(MenuManager.STATE_MENU) &&
+                        (menuScreen.equals(MenuManager.SCREEN_OPTIONS) ||
+                                menuScreen.equals(MenuManager.SCREEN_CREDITS) ||
+                                menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT)))) {
+
+            g2d.setColor(new Color(0, 0, 0, 180));
+            g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        }
+
+        menuManager.drawMenuScreen(g2d, gameState, menuScreen, score, selectedMenuItem, levelManager.getCurrentLevel(), isMuted, currentLanguage);
+    }
+
+
+    /**
+     * Cập nhật logic game: vị trí đối tượng, va chạm, power-ups, và kiểm tra mất mạng/game over.
+     */
     public void updateGame() {
         if (gameState.equals(MenuManager.STATE_MENU) || gameState.equals(MenuManager.STATE_PAUSED) || gameState.equals(MenuManager.STATE_GAME_OVER) || gameState.equals(MenuManager.STATE_GAME_WIN)) {
             return;
         }
 
-        // Xử lý Fade In/Out
         if (isFadingOut || isFadingIn) {
             handleFadeEffect();
-            return; // Dừng logic game khi đang fade
+            return;
         }
 
 
@@ -281,7 +251,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             return;
         }
 
-        // Logic trạng thái "playing"
         paddle.update();
         if (paddle.getX() < 0) paddle.setX(0);
         else if (paddle.getX() + paddle.getWidth() > GAME_WIDTH) paddle.setX(GAME_WIDTH - paddle.getWidth());
@@ -317,9 +286,8 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             lives--;
 
             if (lives > 0) {
-                startFadeOut(true); // Bắt đầu Fade Out khi mất mạng
+                startFadeOut(true);
             } else {
-                // GAME OVER
                 soundManager.stopSound(MUSIC_PATH);
                 if (!isMuted) soundManager.playSound(GAME_OVER_PATH, false);
                 gameState = MenuManager.STATE_GAME_OVER;
@@ -332,7 +300,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             pu.update();
 
             if (pu.checkCollision(paddle)) {
-                if (!isMuted) soundManager.playSound(POWERUP_PICKUP_PATH, false); // Dùng âm thanh pickup
+                if (!isMuted) soundManager.playSound(POWERUP_PICKUP_PATH, false);
 
                 if (!balls.isEmpty()) {
                     Ball mainBall = balls.get(0);
@@ -354,6 +322,360 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         checkGameOver();
     }
 
+    /**
+     * Kiểm tra điều kiện hoàn thành level hoặc chiến thắng game.
+     */
+    public void checkGameOver() {
+        if (bricks.isEmpty()) {
+            if (levelManager.getCurrentLevel() != 10) {
+                levelManager.nextLevel();
+                this.isLifeLostFade = false;
+                startFadeOut(false);
+            } else {
+                if (!isMuted) soundManager.stopSound(MUSIC_PATH);
+                if (!isMuted) soundManager.playSound(GAME_OVER_PATH, false);
+                gameState = MenuManager.STATE_GAME_WIN;
+            }
+            return;
+        }
+    }
+
+    /**
+     * @see javax.swing.JComponent#paintComponent(Graphics)
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        draw(g);
+        Toolkit.getDefaultToolkit().sync();
+    }
+
+    /**
+     * Phương thức chính của luồng game, gọi updateGame() và repaint() liên tục.
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run() {
+        while (true) {
+            updateGame();
+            repaint();
+            try {
+                Thread.sleep(DELAY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /**
+     * Xử lý sự kiện nhấn phím, bao gồm điều khiển paddle và điều hướng menu.
+     * @param e Sự kiện phím.
+     * @see java.awt.event.KeyListener#keyPressed(KeyEvent)
+     */
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        if (menuScreen.equals(MenuManager.SCREEN_CREDITS)) {
+            if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_ENTER) {
+                menuScreen = MenuManager.SCREEN_MAIN;
+                selectedMenuItem = MenuManager.MAIN_CREDITS;
+            }
+            return;
+        }
+
+        if (menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT) && key == KeyEvent.VK_ESCAPE) {
+            handleMenuSelection(MenuManager.SCREEN_LEVEL_SELECT, MenuManager.LEVEL_BACK);
+            return;
+        }
+
+
+        if (key == KeyEvent.VK_P || key == KeyEvent.VK_ESCAPE) {
+            if (gameState.equals(MenuManager.STATE_PLAYING) || gameState.equals(MenuManager.STATE_READY)) {
+                gameState = MenuManager.STATE_PAUSED;
+                menuScreen = MenuManager.SCREEN_PAUSE;
+                selectedMenuItem = MenuManager.PAUSE_RESUME;
+                return;
+            } else if (gameState.equals(MenuManager.STATE_PAUSED)) {
+                gameState = MenuManager.STATE_PLAYING;
+                return;
+            } else if (gameState.equals(MenuManager.STATE_MENU) && key == KeyEvent.VK_ESCAPE) {
+                handleMenuSelection(MenuManager.SCREEN_MAIN, MenuManager.MAIN_EXIT);
+                return;
+            } else if (menuScreen.equals(MenuManager.SCREEN_OPTIONS) && gameState.equals(MenuManager.STATE_MENU)) {
+                handleMenuSelection(MenuManager.SCREEN_OPTIONS, MenuManager.OPTIONS_BACK);
+                return;
+            }
+        }
+
+        if (gameState.equals(MenuManager.STATE_MENU) || gameState.equals(MenuManager.STATE_PAUSED)) {
+            int count = getMenuCount();
+
+            if (key == KeyEvent.VK_UP) {
+                selectedMenuItem = (selectedMenuItem - 1 + count) % count;
+            } else if (key == KeyEvent.VK_DOWN) {
+                selectedMenuItem = (selectedMenuItem + 1) % count;
+            } else if (key == KeyEvent.VK_ENTER) {
+                handleMenuSelection(menuScreen, selectedMenuItem);
+            }
+            return;
+        }
+
+        if (key == KeyEvent.VK_ENTER) {
+            if (gameState.equals(MenuManager.STATE_GAME_OVER) || gameState.equals(MenuManager.STATE_GAME_WIN)) {
+                initGame();
+            }
+            return;
+        }
+
+        if (key == KeyEvent.VK_SPACE) {
+            if (gameState.equals(MenuManager.STATE_READY)) {
+                if (!balls.isEmpty()) {
+                    Ball ball = balls.get(0);
+                    ball.setDx(1);
+                    ball.setDy(-1);
+                    gameState = MenuManager.STATE_PLAYING;
+                }
+            } else if (gameState.equals(MenuManager.STATE_PLAYING)) {
+                gameState = MenuManager.STATE_PAUSED;
+                menuScreen = MenuManager.SCREEN_PAUSE;
+                selectedMenuItem = MenuManager.PAUSE_RESUME;
+            }
+            return;
+        }
+
+        if (gameState.equals(MenuManager.STATE_READY) || gameState.equals(MenuManager.STATE_PLAYING)) {
+            if (key == KeyEvent.VK_LEFT) {
+                paddle.setDx(-1);
+            }
+            if (key == KeyEvent.VK_RIGHT) {
+                paddle.setDx(1);
+            }
+        }
+    }
+
+    /**
+     * Xử lý sự kiện nhả phím (dừng di chuyển paddle).
+     * @param e Sự kiện phím.
+     * @see java.awt.event.KeyListener#keyReleased(KeyEvent)
+     */
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (gameState.equals(MenuManager.STATE_READY) || gameState.equals(MenuManager.STATE_PLAYING)) {
+            if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+                paddle.setDx(0);
+            }
+        }
+    }
+
+    /**
+     * @param e Sự kiện phím.
+     * @see java.awt.event.KeyListener#keyTyped(KeyEvent)
+     */
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    /**
+     * Xử lý sự kiện click chuột, chủ yếu dùng để chọn mục menu.
+     * @param e Sự kiện chuột.
+     * @see java.awt.event.MouseListener#mouseClicked(MouseEvent)
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if ((gameState.equals(MenuManager.STATE_MENU) || gameState.equals(MenuManager.STATE_PAUSED))
+                && !menuScreen.equals(MenuManager.SCREEN_CREDITS)) {
+
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+
+            int count = getMenuCount();
+
+            for (int i = 0; i < count; i++) {
+                Rectangle bounds = getMenuItemBounds(menuScreen, i);
+
+                if (bounds.contains(mouseX, mouseY)) {
+                    selectedMenuItem = i;
+                    handleMenuSelection(menuScreen, selectedMenuItem);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param e Sự kiện chuột.
+     * @see java.awt.event.MouseListener#mousePressed(MouseEvent)
+     */
+    @Override
+    public void mousePressed(MouseEvent e) {}
+
+    /**
+     * @param e Sự kiện chuột.
+     * @see java.awt.event.MouseListener#mouseReleased(MouseEvent)
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    /**
+     * @param e Sự kiện chuột.
+     * @see java.awt.event.MouseListener#mouseEntered(MouseEvent)
+     */
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    /**
+     * @param e Sự kiện chuột.
+     * @see java.awt.event.MouseListener#mouseExited(MouseEvent)
+     */
+    @Override
+    public void mouseExited(MouseEvent e) {}
+
+    /**
+     * Tạo một quả bóng mới ở vị trí trung tâm của paddle và thêm vào danh sách balls.
+     */
+    private void createStartingBall() {
+        Ball newBall = new Ball(
+                paddle.getX() + (paddle.getWidth() / 2 - 10),
+                paddle.getY() - 20,
+                15, 15,
+                BALL_START_SPEED,
+                0, 0
+        );
+        balls.add(newBall);
+    }
+
+    /**
+     * Thiết lập trạng thái game ban đầu (Menu chính), bao gồm paddle, bóng, điểm số, mạng và level.
+     */
+    private void initGame() {
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
+        balls = new ArrayList<>();
+
+        createStartingBall();
+
+        powerUps = new ArrayList<>();
+        score = 0;
+        lives = 3;
+
+        gameState = MenuManager.STATE_MENU;
+
+        if (levelManager == null) {
+            levelManager = new LevelManager(GAME_WIDTH, GAME_HEIGHT);
+        }
+        bricks = levelManager.createBricksForCurrentLevel();
+
+        menuScreen = MenuManager.SCREEN_MAIN;
+        selectedMenuItem = MenuManager.MAIN_START;
+        isLifeLostFade = false;
+    }
+
+    /**
+     * Thiết lập trạng thái game khi bắt đầu từ Menu Chính (Reset toàn bộ).
+     */
+    private void resetGameForPlay() {
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
+        balls = new ArrayList<>();
+        createStartingBall();
+        powerUps = new ArrayList<>();
+        score = 0;
+        lives = 3;
+
+        bricks = levelManager.createBricksForCurrentLevel();
+
+        isFadingIn = true;
+        fadeAlpha = 0;
+        gameState = MenuManager.STATE_PLAYING;
+    }
+
+    /**
+     * Khởi động lại màn chơi hiện tại, reset vị trí paddle/ball, power-ups và tải lại gạch.
+     */
+    private void restartCurrentLevel() {
+        paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
+        balls.clear();
+        createStartingBall();
+
+        powerUps.clear();
+        if (activePowerUp != null) {
+            if (!balls.isEmpty()) activePowerUp.removeEffect(paddle, balls.get(0));
+            activePowerUp = null;
+        }
+        paddle.setActiveLaser(false);
+        laserBeam = null;
+
+
+        bricks = levelManager.createBricksForCurrentLevel();
+
+        gameState = MenuManager.STATE_READY;
+
+        isFadingOut = false;
+        isFadingIn = false;
+        fadeAlpha = 255;
+        isLifeLostFade = false;
+
+        if (isMuted) soundManager.stopSound(MUSIC_PATH);
+        else soundManager.playSound(MUSIC_PATH, true);
+    }
+
+    /**
+     * Bắt đầu hiệu ứng Fade Out, xóa bóng và đặt cờ mất mạng/chuyển level.
+     * @param isLifeLost true nếu fade do mất mạng, false nếu do chuyển level.
+     */
+    private void startFadeOut(boolean isLifeLost) {
+        if (isLifeLost) {
+            if (!isMuted) soundManager.playSound(LOSE_LIFE_PATH, false);
+        }
+        isFadingOut = true;
+        fadeAlpha = 255;
+        balls.clear();
+
+        this.isLifeLostFade = isLifeLost;
+    }
+
+    /**
+     * Xử lý hiệu ứng Fade In/Out theo từng bước, bao gồm logic giữ gạch khi mất mạng.
+     */
+    private void handleFadeEffect() {
+        if (isFadingOut) {
+            fadeAlpha -= FADE_SPEED;
+            if (fadeAlpha <= 0) {
+                fadeAlpha = 0;
+                isFadingOut = false;
+
+                paddle = new Paddle(GAME_WIDTH / 2 - 50, GAME_HEIGHT - 80, 140, 20, PADDLE_SPEED);
+                createStartingBall();
+
+                powerUps.clear();
+                if (activePowerUp != null) {
+                    if (!balls.isEmpty()) activePowerUp.removeEffect(paddle, balls.get(0));
+                    activePowerUp = null;
+                }
+                paddle.setActiveLaser(false);
+                laserBeam = null;
+
+                if (!isLifeLostFade) {
+                    bricks = levelManager.createBricksForCurrentLevel();
+                }
+
+                isLifeLostFade = false;
+
+                isFadingIn = true;
+            }
+        } else if (isFadingIn) {
+            fadeAlpha += FADE_SPEED;
+            if (fadeAlpha >= 255) {
+                fadeAlpha = 255;
+                isFadingIn = false;
+                gameState = MenuManager.STATE_READY;
+            }
+        }
+    }
+
+    /**
+     * Xử lý bắn laser từ paddle (nếu có power-up Laser).
+     */
     private void handleLaserShot() {
         if (paddle.isLaserReady() && laserBeam == null) {
             if (System.currentTimeMillis() - paddle.getLaserActivationTime() >= LASER_SHOT_DELAY) {
@@ -371,6 +693,10 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         }
     }
 
+    /**
+     * Kiểm tra và xử lý va chạm giữa bóng (ball) và paddle/gạch (brick).
+     * @param ball Quả bóng cần kiểm tra va chạm.
+     */
     private void checkBallCollisions(Ball ball) {
 
         if (ball.checkCollision(paddle)) {
@@ -408,25 +734,20 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
 
                 boolean hitVertical = ball.getDy() != 0;
 
-                // LOGIC ĐẨY BÓNG VÀ ĐẢO CHIỀU ĐƠN GIẢN
                 if (hitVertical) {
                     if (ball.getDy() > 0) {
-                        // Va chạm mặt trên gạch: Đẩy bóng lên trên gạch
                         ball.setY(brick.getY() - ball.getHeight());
                     } else {
-                        // Va chạm mặt dưới gạch: Đẩy bóng xuống dưới gạch
                         ball.setY(brick.getY() + brick.getHeight());
                     }
-                    ball.setDy(-ball.getDy()); // Đảo chiều dọc
+                    ball.setDy(-ball.getDy());
                 } else {
                     if (ball.getDx() > 0) {
-                        // Va chạm mặt trái gạch: Đẩy bóng sang trái gạch
                         ball.setX(brick.getX() - ball.getWidth());
                     } else {
-                        // Va chạm mặt phải gạch: Đẩy bóng sang phải gạch
                         ball.setX(brick.getX() + brick.getWidth());
                     }
-                    ball.setDx(-ball.getDx()); // Đảo chiều ngang
+                    ball.setDx(-ball.getDx());
                 }
 
 
@@ -453,6 +774,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         }
     }
 
+    /**
+     * Kiểm tra thời gian hiệu lực của PowerUp đang hoạt động và loại bỏ nó nếu hết hạn.
+     */
     private void checkPowerUpDuration() {
         if (activePowerUp != null && !(activePowerUp instanceof Multiball) && !(activePowerUp instanceof LaserPowerUp)) {
             if (System.currentTimeMillis() - powerUpStartTime > activePowerUp.getDuration()) {
@@ -464,123 +788,10 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         }
     }
 
-    public void checkGameOver() {
-        if (bricks.isEmpty()) {
-            if (levelManager.getCurrentLevel() != 10) {
-                levelManager.nextLevel();
-                startFadeOut(false);
-            } else {
-                if (!isMuted) soundManager.stopSound(MUSIC_PATH);
-
-                // Phát âm thanh Game Over (Sử dụng tạm lose.wav hoặc thay bằng file win nếu có)
-                if (!isMuted) soundManager.playSound(GAME_OVER_PATH, false);
-
-                gameState = MenuManager.STATE_GAME_WIN;
-            }
-            return;
-        }
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        draw(g);
-        Toolkit.getDefaultToolkit().sync();
-    }
-
-    public void draw(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-        // 1. VẼ BACKGROUND CHUNG
-        if (gameState.equals(MenuManager.STATE_MENU) && menuScreen.equals(MenuManager.SCREEN_MAIN) && mainMenuImage != null) {
-            g2d.drawImage(mainMenuImage, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
-        } else if (backgroundImage != null) {
-            g2d.drawImage(backgroundImage, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
-        } else {
-            g2d.setColor(Color.BLACK);
-            g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        }
-
-        // 2. THIẾT LẬP ALPHA CHO PADDLE VÀ BALLS (Fade Effect)
-        if (isFadingIn || isFadingOut) {
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fadeAlpha / 255f));
-        }
-
-
-        // 3. VẼ CÁC OBJECT TRÒ CHƠI
-        if (!gameState.equals(MenuManager.STATE_MENU) || (gameState.equals(MenuManager.STATE_MENU) && menuScreen.equals(MenuManager.SCREEN_OPTIONS))) {
-
-            paddle.render(g2d);
-
-            // Chỉ vẽ bóng khi không phải fade out
-            if (!isFadingOut) {
-                for (Ball ball : balls) {
-                    ball.render(g2d);
-                }
-            }
-
-            for (Brick brick : bricks) {
-                brick.render(g2d);
-            }
-            for (PowerUp pu : powerUps) {
-                pu.render(g2d);
-            }
-
-            if (laserBeam != null) {
-                laserBeam.render(g2d);
-            }
-
-            // 4. ĐẶT LẠI ALPHA COMPOSITE (Nếu đã thay đổi)
-            if (isFadingIn || isFadingOut) {
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-            }
-
-
-            // Vẽ HUD
-            if (!gameState.equals(MenuManager.STATE_MENU) && !gameState.equals(MenuManager.STATE_GAME_OVER) && !gameState.equals(MenuManager.STATE_GAME_WIN)) {
-                g2d.setColor(Color.WHITE);
-                g2d.drawString("Score: " + score, 10, 20);
-                g2d.drawString("Lives: " + lives, 10, 40);
-                g2d.drawString("Level: " + levelManager.getCurrentLevel(), 10, 60);
-
-                String puStatus = activePowerUp != null ? activePowerUp.getType() :
-                        (paddle.isLaserReady() ? "Laser Pending" : "None");
-                g2d.drawString("PowerUp Active: " + puStatus, 10, 80);
-            }
-        }
-
-        // 5. VẼ LỚP PHỦ CHO MENU
-        if (gameState.equals(MenuManager.STATE_PAUSED) ||
-                (gameState.equals(MenuManager.STATE_MENU) &&
-                        (menuScreen.equals(MenuManager.SCREEN_OPTIONS) ||
-                                menuScreen.equals(MenuManager.SCREEN_CREDITS) ||
-                                menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT)))) {
-
-            g2d.setColor(new Color(0, 0, 0, 180)); // Dùng màu đen bán trong suốt
-            g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        }
-
-
-        // 6. VẼ NỘI DUNG MENU
-        menuManager.drawMenuScreen(g2d, gameState, menuScreen, score, selectedMenuItem, levelManager.getCurrentLevel(), isMuted, currentLanguage);
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            updateGame();
-            repaint();
-            try {
-                Thread.sleep(DELAY);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
+    /**
+     * Lấy số lượng mục trong menu hiện tại.
+     * @return Số lượng mục menu.
+     */
     private int getMenuCount() {
         if (menuScreen.equals(MenuManager.SCREEN_MAIN)) return MenuManager.MAIN_ITEMS_COUNT;
         if (menuScreen.equals(MenuManager.SCREEN_PAUSE)) return MenuManager.PAUSE_ITEMS_COUNT;
@@ -589,6 +800,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         return 0;
     }
 
+    /**
+     * Tính toán ranh giới (bounds) của một mục menu để xử lý click chuột.
+     * @param screen Màn hình menu hiện tại.
+     * @param itemIndex Chỉ số của mục menu.
+     * @return Đối tượng Rectangle biểu thị ranh giới.
+     */
     private Rectangle getMenuItemBounds(String screen, int itemIndex) {
         if (screen.equals(MenuManager.SCREEN_CREDITS) || screen.equals(MenuManager.SCREEN_LEVEL_SELECT)) return new Rectangle(0, 0, 0, 0);
 
@@ -600,17 +817,16 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         int height = 40;
         int x = GAME_WIDTH / 2 - width / 2;
 
-        // Điều chỉnh cho Level Select 2 cột (Chỉ dùng cho logic click)
         if (screen.equals(MenuManager.SCREEN_LEVEL_SELECT)) {
             int half = MenuManager.MAX_LEVEL / 2;
             int col1X = GAME_WIDTH / 2 - 150;
             int col2X = GAME_WIDTH / 2 + 50;
 
-            if (itemIndex < half) { // Cột 1
+            if (itemIndex < half) {
                 x = col1X - 20;
-            } else if (itemIndex < MenuManager.MAX_LEVEL) { // Cột 2
+            } else if (itemIndex < MenuManager.MAX_LEVEL) {
                 x = col2X - 20;
-            } else { // Back button
+            } else {
                 x = GAME_WIDTH / 2 - 150;
             }
             y = itemIndex < MenuManager.MAX_LEVEL ? (GAME_HEIGHT / 2 - 80) + (itemIndex % half) * 35 - 30 :
@@ -623,95 +839,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
         return new Rectangle(x, y, width, height);
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-
-        // Xử lý ESCAPE/ENTER để thoát khỏi Credits
-        if (menuScreen.equals(MenuManager.SCREEN_CREDITS)) {
-            if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_ENTER) {
-                menuScreen = MenuManager.SCREEN_MAIN;
-                selectedMenuItem = MenuManager.MAIN_CREDITS;
-            }
-            return;
-        }
-
-        // Xử lý ESCAPE trong Level Select
-        if (menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT) && key == KeyEvent.VK_ESCAPE) {
-            handleMenuSelection(MenuManager.SCREEN_LEVEL_SELECT, MenuManager.LEVEL_BACK);
-            return;
-        }
-
-
-        // Xử lý PAUSE/ESCAPE
-        if (key == KeyEvent.VK_P || key == KeyEvent.VK_ESCAPE) {
-            if (gameState.equals(MenuManager.STATE_PLAYING) || gameState.equals(MenuManager.STATE_READY)) {
-                gameState = MenuManager.STATE_PAUSED;
-                menuScreen = MenuManager.SCREEN_PAUSE;
-                selectedMenuItem = MenuManager.PAUSE_RESUME;
-                return;
-            } else if (gameState.equals(MenuManager.STATE_PAUSED)) {
-                gameState = MenuManager.STATE_PLAYING;
-                return;
-            } else if (gameState.equals(MenuManager.STATE_MENU) && key == KeyEvent.VK_ESCAPE) {
-                handleMenuSelection(MenuManager.SCREEN_MAIN, MenuManager.MAIN_EXIT);
-                return;
-            } else if (menuScreen.equals(MenuManager.SCREEN_OPTIONS) && gameState.equals(MenuManager.STATE_MENU)) {
-                handleMenuSelection(MenuManager.SCREEN_OPTIONS, MenuManager.OPTIONS_BACK);
-                return;
-            }
-        }
-
-        // Xử lý điều hướng trong Menu (Chính, Pause, Options, Level Select)
-        if (gameState.equals(MenuManager.STATE_MENU) || gameState.equals(MenuManager.STATE_PAUSED)) {
-            int count = getMenuCount();
-
-            if (key == KeyEvent.VK_UP) {
-                selectedMenuItem = (selectedMenuItem - 1 + count) % count;
-            } else if (key == KeyEvent.VK_DOWN) {
-                selectedMenuItem = (selectedMenuItem + 1) % count;
-            } else if (key == KeyEvent.VK_ENTER) {
-                handleMenuSelection(menuScreen, selectedMenuItem);
-            }
-            return;
-        }
-
-        // Xử lý quay lại Menu sau Game Over/Win
-        if (key == KeyEvent.VK_ENTER) {
-            if (gameState.equals(MenuManager.STATE_GAME_OVER) || gameState.equals(MenuManager.STATE_GAME_WIN)) {
-                initGame();
-            }
-            return;
-        }
-
-        // Xử lý Launch Ball và Pause bằng Space
-        if (key == KeyEvent.VK_SPACE) {
-            if (gameState.equals(MenuManager.STATE_READY)) {
-                if (!balls.isEmpty()) {
-                    Ball ball = balls.get(0);
-                    ball.setDx(1);
-                    ball.setDy(-1);
-                    gameState = MenuManager.STATE_PLAYING;
-                }
-            } else if (gameState.equals(MenuManager.STATE_PLAYING)) {
-                gameState = MenuManager.STATE_PAUSED; // Tạm dừng bằng Space
-                menuScreen = MenuManager.SCREEN_PAUSE;
-                selectedMenuItem = MenuManager.PAUSE_RESUME;
-            }
-            return;
-        }
-
-        // Xử lý điều khiển Paddle
-        if (gameState.equals(MenuManager.STATE_READY) || gameState.equals(MenuManager.STATE_PLAYING)) {
-            if (key == KeyEvent.VK_LEFT) {
-                paddle.setDx(-1);
-            }
-            if (key == KeyEvent.VK_RIGHT) {
-                paddle.setDx(1);
-            }
-        }
-    }
-
+    /**
+     * Xử lý hành động khi một mục menu được chọn.
+     * @param currentScreen Màn hình menu hiện tại.
+     * @param selectedItem Mục đã chọn.
+     */
     private void handleMenuSelection(String currentScreen, int selectedItem) {
         if (currentScreen.equals(MenuManager.SCREEN_MAIN)) {
             switch (selectedItem) {
@@ -736,7 +868,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                     }
                     break;
             }
-        } else if (currentScreen.equals(MenuManager.SCREEN_LEVEL_SELECT)) { // LOGIC CHỌN LEVEL
+        } else if (currentScreen.equals(MenuManager.SCREEN_LEVEL_SELECT)) {
 
             if (selectedItem >= 0 && selectedItem < MenuManager.MAX_LEVEL) {
                 int levelToSet = selectedItem + 1;
@@ -781,53 +913,4 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             }
         }
     }
-
-    // --- Xử lý MouseListener ---
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        if ((gameState.equals(MenuManager.STATE_MENU) || gameState.equals(MenuManager.STATE_PAUSED))
-                && !menuScreen.equals(MenuManager.SCREEN_CREDITS)) {
-
-            int mouseX = e.getX();
-            int mouseY = e.getY();
-
-            int count = getMenuCount();
-
-            for (int i = 0; i < count; i++) {
-                Rectangle bounds = getMenuItemBounds(menuScreen, i);
-
-                if (bounds.contains(mouseX, mouseY)) {
-                    selectedMenuItem = i;
-                    handleMenuSelection(menuScreen, selectedMenuItem);
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {}
-
-    @Override
-    public void mouseReleased(MouseEvent e) {}
-
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-
-    @Override
-    public void mouseExited(MouseEvent e) {}
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        int key = e.getKeyCode();
-        if (gameState.equals(MenuManager.STATE_READY) || gameState.equals(MenuManager.STATE_PLAYING)) {
-            if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
-                paddle.setDx(0);
-            }
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {}
 }

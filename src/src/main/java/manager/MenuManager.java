@@ -5,6 +5,7 @@ import game.GameManager;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.SwingUtilities;
+import java.util.List;
 
 /**
  * Quản lý và vẽ tất cả các màn hình menu và trạng thái hiển thị của game.
@@ -23,13 +24,16 @@ public class MenuManager {
     public static final String SCREEN_OPTIONS = "options";
     public static final String SCREEN_CREDITS = "credits";
     public static final String SCREEN_LEVEL_SELECT = "levelSelect";
+    public static final String SCREEN_HIGHSCORE = "highScore";
 
+    // --- Hằng số Mục Menu Chính ---
     public static final int MAIN_START = 0;
     public static final int MAIN_LEVEL_SELECT = 1;
-    public static final int MAIN_OPTIONS = 2;
-    public static final int MAIN_CREDITS = 3;
-    public static final int MAIN_EXIT = 4;
-    public static final int MAIN_ITEMS_COUNT = 5;
+    public static final int MAIN_HIGHSCORE = 2;
+    public static final int MAIN_OPTIONS = 3;
+    public static final int MAIN_CREDITS = 4;
+    public static final int MAIN_EXIT = 5;
+    public static final int MAIN_ITEMS_COUNT = 6;
 
     public static final int MAX_LEVEL = 10;
     public static final int LEVEL_BACK = MAX_LEVEL;
@@ -78,6 +82,8 @@ public class MenuManager {
         en.put("CREDITS_LINE_2", "They created ANKANOIRD to save the project.");
         en.put("CREDITS_LINE_3", "Break the bricks and submit on time!");
         en.put("CREDITS_LINE_4", "DEVELOPED BY: Nguyen Huu Kien - Nguyen Duc Thanh - Phan Huy Quang");
+        en.put("HIGH_SCORE_TITLE", "HALL OF FAME");
+        en.put("HIGHSCORE_MSG", "Congratulations! You finished the game!\nPlease enter your name to save your score:");
 
         texts.put("EN", en);
 
@@ -108,6 +114,9 @@ public class MenuManager {
         vi.put("CREDITS_LINE_2", "Họ tạo ra ANKANOIRD để giải cứu bài tập lớn.");
         vi.put("CREDITS_LINE_3", "Phá gạch cuối cùng, nộp bài đúng hạn!");
         vi.put("CREDITS_LINE_4", "PHÁT TRIỂN BỞI: Nguyễn Hữu Kiên - Nguyễn Đức Thành - Phan Huy Quang");
+        vi.put("HIGH_SCORE_TITLE", "BẢNG XẾP HẠNG");
+        vi.put("HIGHSCORE_MSG", "Chúc mừng! Bạn đã hoàn thành game.\nVui lòng nhập tên để lưu vào bảng xếp hạng:");
+
 
         texts.put("VI", vi);
     }
@@ -135,8 +144,9 @@ public class MenuManager {
      * @param currentLevel Level hiện tại của game.
      * @param isMuted Trạng thái âm thanh (True nếu tắt tiếng).
      * @param currentLanguage Ngôn ngữ hiện tại.
+     * @param gameManager Đối tượng GameManager để truy cập dữ liệu (ví dụ: High Scores).
      */
-    public void drawMenuScreen(Graphics2D g2d, String gameState, String menuScreen, int score, int selectedItem, int currentLevel, boolean isMuted, String currentLanguage) {
+    public void drawMenuScreen(Graphics2D g2d, String gameState, String menuScreen, int score, int selectedItem, int currentLevel, boolean isMuted, String currentLanguage, GameManager gameManager) {
 
         int gameWidth = GameManager.GAME_WIDTH;
         int gameHeight = GameManager.GAME_HEIGHT;
@@ -179,6 +189,7 @@ public class MenuManager {
                 menuItems = new String[]{
                         getText("START_GAME", lang),
                         getText("LEVEL_SELECT", lang),
+                        getText("HIGH_SCORE_TITLE", lang),
                         getText("OPTIONS", lang),
                         getText("CREDITS", lang),
                         getText("EXIT", lang)
@@ -246,6 +257,31 @@ public class MenuManager {
                     creditY += creditLineHeight;
                 }
                 return;
+            } else if (menuScreen.equals(SCREEN_HIGHSCORE)) {
+                title = getText("HIGH_SCORE_TITLE", lang);
+
+                g2d.setFont(new Font("Arial", Font.BOLD, 30));
+                g2d.setColor(Color.YELLOW);
+                g2d.drawString(title, gameWidth / 2 - g2d.getFontMetrics().stringWidth(title) / 2, 80);
+
+                g2d.setFont(new Font("Arial", Font.PLAIN, 20));
+                g2d.setColor(Color.WHITE);
+
+                List<String> scores = gameManager.getHighScoresData();
+                int startY = 150;
+                int lineHeight = 30;
+
+                for (int i = 0; i < scores.size(); i++) {
+                    String line = (i + 1) + ". " + scores.get(i);
+                    g2d.drawString(line, gameWidth / 2 - g2d.getFontMetrics().stringWidth(line) / 2, startY + i * lineHeight);
+                }
+
+                g2d.setFont(new Font("Arial", Font.ITALIC, 18));
+                g2d.setColor(Color.LIGHT_GRAY);
+                String returnMsg = "PRESS ENTER/ESCAPE TO RETURN";
+                g2d.drawString(returnMsg, gameWidth / 2 - g2d.getFontMetrics().stringWidth(returnMsg) / 2, gameHeight - 50);
+
+                return;
             } else {
                 return;
             }
@@ -309,12 +345,7 @@ public class MenuManager {
                         g2d.setColor(Color.WHITE);
                     }
 
-                    int textX;
-                    if (i < MAX_LEVEL) {
-                        textX = rectX + (finalRectWidth - fm.stringWidth(item)) / 2;
-                    } else {
-                        textX = rectX + (finalRectWidth - fm.stringWidth(item)) / 2;
-                    }
+                    int textX = rectX + (finalRectWidth - fm.stringWidth(item)) / 2;
 
                     g2d.drawString(item, textX, itemY);
                     g2d.setStroke(new BasicStroke(1));

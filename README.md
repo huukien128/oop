@@ -139,7 +139,7 @@ GameObject (abstract)
 <div style="display: flex; justify-content: space-around;">
   <img src="https://github.com/huukien128/oop/blob/7a9a178094cd222d3c79993b1a6aa0fcd1000e65/menu.png" alt="Menu Screen" width="400"/>
   <img src="https://github.com/huukien128/oop/blob/7a9a178094cd222d3c79993b1a6aa0fcd1000e65/gameplay.png" width="400"/>
-  <img src="https://github.com/huukien128/oop/blob/7a9a178094cd222d3c79993b1a6aa0fcd1000e65/src/src/main/resources/images/background.png" alt="Level Complete" width="400"/>
+  <img src="https://github.com/huukien128/oop/blob/7a9a178094cd222d3c79993b1a6aa0fcd1000e65/src/src/main/resources/images/background.png" alt="Level Complete" width="800800"/>
 </div>
 
 ## VIII. 📚 Tài liệu Tham khảo và công cụ hỗ trợ

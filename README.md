@@ -3,8 +3,8 @@
 ## I. Thông tin nhóm
 - **Họ và tên:**  
   - Phan Huy Quang — MSSV: 24022827  
-  - Nguyễn Hữu Kiên — MSSV: (bổ sung)  
-  - Nguyễn Đức Thành — MSSV: (bổ sung)  
+  - Nguyễn Hữu Kiên — MSSV: 24022807
+  - Nguyễn Đức Thành — MSSV: 24022833 
 - **Lớp:** K69I-CN1  
 - **Môn học:** Lập trình hướng đối tượng (OOP) — INT2204 15
 
@@ -37,3 +37,4 @@ Người chơi điều khiển thanh đỡ để đỡ bóng, phá vỡ các lo�
 - **ESC:** Thoát game  
 - **Chuột:** Click vào menu để chọn tùy chọn
 
+🎯 Hãy chơi game và tận hưởng những trải nghiệm tuyệt vời nhất cùng Akanoid!

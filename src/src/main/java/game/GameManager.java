@@ -16,8 +16,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -89,6 +91,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     private final String GAME_OVER_PATH = "/sound/lose.wav";
     private final String POWERUP_PICKUP_PATH = "/sound/powerup.wav";
 
+    private static final String HIGHSCORE_FILE = "highscores.txt";
+    private static final int MAX_HIGHSCORE_ENTRIES = 10;
+    private List<String> highScoresData = new ArrayList<>();
+    private boolean waitingForName = false;
+
     /**
      * Khởi tạo GameManager, tải tài nguyên, thiết lập quản lý âm thanh và menu.
      */
@@ -133,6 +140,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
 
         if (!isMuted) soundManager.playSound(MUSIC_PATH, true);
 
+        loadHighScores();
         initGame();
         setFocusable(true);
         addKeyListener(this);
@@ -197,7 +205,6 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             }
 
 
-            // Vẽ HUD
             if (!gameState.equals(MenuManager.STATE_MENU) && !gameState.equals(MenuManager.STATE_GAME_OVER) && !gameState.equals(MenuManager.STATE_GAME_WIN)) {
                 g2d.setColor(Color.WHITE);
                 g2d.drawString("Score: " + score, 10, 20);
@@ -214,13 +221,14 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                 (gameState.equals(MenuManager.STATE_MENU) &&
                         (menuScreen.equals(MenuManager.SCREEN_OPTIONS) ||
                                 menuScreen.equals(MenuManager.SCREEN_CREDITS) ||
-                                menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT)))) {
+                                menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT) ||
+                                menuScreen.equals(MenuManager.SCREEN_HIGHSCORE)))) {
 
             g2d.setColor(new Color(0, 0, 0, 180));
             g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         }
 
-        menuManager.drawMenuScreen(g2d, gameState, menuScreen, score, selectedMenuItem, levelManager.getCurrentLevel(), isMuted, currentLanguage);
+        menuManager.drawMenuScreen(g2d, gameState, menuScreen, score, selectedMenuItem, levelManager.getCurrentLevel(), isMuted, currentLanguage, this);
     }
 
 
@@ -377,6 +385,9 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
 
+        // KHÓA INPUT KHI ĐANG CHỜ NHẬP TÊN
+        if (waitingForName) return;
+
         if (menuScreen.equals(MenuManager.SCREEN_CREDITS)) {
             if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_ENTER) {
                 menuScreen = MenuManager.SCREEN_MAIN;
@@ -387,6 +398,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
 
         if (menuScreen.equals(MenuManager.SCREEN_LEVEL_SELECT) && key == KeyEvent.VK_ESCAPE) {
             handleMenuSelection(MenuManager.SCREEN_LEVEL_SELECT, MenuManager.LEVEL_BACK);
+            return;
+        }
+
+        if (menuScreen.equals(MenuManager.SCREEN_HIGHSCORE) && (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_ENTER)) {
+            menuScreen = MenuManager.SCREEN_MAIN;
+            selectedMenuItem = MenuManager.MAIN_HIGHSCORE;
             return;
         }
 
@@ -422,9 +439,12 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
             return;
         }
 
+        // Xử lý quay lại Menu sau Game Over/Win (Luôn kích hoạt nhập tên bằng ENTER)
         if (key == KeyEvent.VK_ENTER) {
             if (gameState.equals(MenuManager.STATE_GAME_OVER) || gameState.equals(MenuManager.STATE_GAME_WIN)) {
-                initGame();
+
+                // KHÔNG CẦN KIỂM TRA ĐIỂM CAO, LUÔN MỞ HỘP THOẠI
+                handleNameInput();
             }
             return;
         }
@@ -456,36 +476,13 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     }
 
     /**
-     * Xử lý sự kiện nhả phím (dừng di chuyển paddle).
-     * @param e Sự kiện phím.
-     * @see java.awt.event.KeyListener#keyReleased(KeyEvent)
-     */
-    @Override
-    public void keyReleased(KeyEvent e) {
-        int key = e.getKeyCode();
-        if (gameState.equals(MenuManager.STATE_READY) || gameState.equals(MenuManager.STATE_PLAYING)) {
-            if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
-                paddle.setDx(0);
-            }
-        }
-    }
-
-    /**
-     * @param e Sự kiện phím.
-     * @see java.awt.event.KeyListener#keyTyped(KeyEvent)
-     */
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    /**
-     * Xử lý sự kiện click chuột, chủ yếu dùng để chọn mục menu.
-     * @param e Sự kiện chuột.
      * @see java.awt.event.MouseListener#mouseClicked(MouseEvent)
      */
     @Override
     public void mouseClicked(MouseEvent e) {
         if ((gameState.equals(MenuManager.STATE_MENU) || gameState.equals(MenuManager.STATE_PAUSED))
-                && !menuScreen.equals(MenuManager.SCREEN_CREDITS)) {
+                && !menuScreen.equals(MenuManager.SCREEN_CREDITS)
+                && !menuScreen.equals(MenuManager.SCREEN_HIGHSCORE)) {
 
             int mouseX = e.getX();
             int mouseY = e.getY();
@@ -505,32 +502,47 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
     }
 
     /**
-     * @param e Sự kiện chuột.
      * @see java.awt.event.MouseListener#mousePressed(MouseEvent)
      */
     @Override
     public void mousePressed(MouseEvent e) {}
 
     /**
-     * @param e Sự kiện chuột.
      * @see java.awt.event.MouseListener#mouseReleased(MouseEvent)
      */
     @Override
     public void mouseReleased(MouseEvent e) {}
 
     /**
-     * @param e Sự kiện chuột.
      * @see java.awt.event.MouseListener#mouseEntered(MouseEvent)
      */
     @Override
     public void mouseEntered(MouseEvent e) {}
 
     /**
-     * @param e Sự kiện chuột.
      * @see java.awt.event.MouseListener#mouseExited(MouseEvent)
      */
     @Override
     public void mouseExited(MouseEvent e) {}
+
+    /**
+     * @see java.awt.event.KeyListener#keyReleased(KeyEvent)
+     */
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (gameState.equals(MenuManager.STATE_READY) || gameState.equals(MenuManager.STATE_PLAYING)) {
+            if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+                paddle.setDx(0);
+            }
+        }
+    }
+
+    /**
+     * @see java.awt.event.KeyListener#keyTyped(KeyEvent)
+     */
+    @Override
+    public void keyTyped(KeyEvent e) {}
 
     /**
      * Tạo một quả bóng mới ở vị trí trung tâm của paddle và thêm vào danh sách balls.
@@ -807,7 +819,7 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
      * @return Đối tượng Rectangle biểu thị ranh giới.
      */
     private Rectangle getMenuItemBounds(String screen, int itemIndex) {
-        if (screen.equals(MenuManager.SCREEN_CREDITS) || screen.equals(MenuManager.SCREEN_LEVEL_SELECT)) return new Rectangle(0, 0, 0, 0);
+        if (screen.equals(MenuManager.SCREEN_CREDITS) || screen.equals(MenuManager.SCREEN_LEVEL_SELECT) || screen.equals(MenuManager.SCREEN_HIGHSCORE)) return new Rectangle(0, 0, 0, 0);
 
         int startY = GAME_HEIGHT / 2 - 80;
         int lineHeight = 35;
@@ -853,6 +865,11 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                 case MenuManager.MAIN_LEVEL_SELECT:
                     menuScreen = MenuManager.SCREEN_LEVEL_SELECT;
                     selectedMenuItem = Math.max(0, levelManager.getCurrentLevel() - 1);
+                    break;
+                case MenuManager.MAIN_HIGHSCORE:
+                    loadHighScores();
+                    menuScreen = MenuManager.SCREEN_HIGHSCORE;
+                    selectedMenuItem = 0;
                     break;
                 case MenuManager.MAIN_OPTIONS:
                     menuScreen = MenuManager.SCREEN_OPTIONS;
@@ -912,5 +929,118 @@ public class GameManager extends JPanel implements KeyListener, Runnable, MouseL
                     break;
             }
         }
+    }
+
+    // --- HIGHSCORE METHODS ---
+
+    /**
+     * Tải điểm cao từ tệp tin highscores.txt.
+     */
+    private void loadHighScores() {
+        highScoresData.clear();
+        try (BufferedReader br = new BufferedReader(new FileReader(HIGHSCORE_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                highScoresData.add(line);
+            }
+            sortHighScores();
+        } catch (FileNotFoundException e) {
+            System.out.println("Tệp điểm cao chưa tồn tại, sẽ được tạo khi lưu.");
+        } catch (IOException e) {
+            System.err.println("Lỗi khi đọc tệp điểm cao: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Sắp xếp danh sách điểm cao và giới hạn lại MAX_HIGHSCORE_ENTRIES.
+     */
+    private void sortHighScores() {
+        highScoresData.sort(new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                try {
+                    int score1 = Integer.parseInt(s1.substring(s1.lastIndexOf("-") + 1).trim());
+                    int score2 = Integer.parseInt(s2.substring(s2.lastIndexOf("-") + 1).trim());
+                    return Integer.compare(score2, score1);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        });
+
+        if (highScoresData.size() > MAX_HIGHSCORE_ENTRIES) {
+            highScoresData = highScoresData.subList(0, MAX_HIGHSCORE_ENTRIES);
+        }
+    }
+
+    /**
+     * Thêm điểm mới và lưu lại toàn bộ bảng xếp hạng.
+     * @param name Tên người chơi.
+     * @param score Điểm số đạt được.
+     */
+    private void saveNewHighScore(String name, int score) {
+        String entry = name + " - " + score;
+        highScoresData.add(entry);
+        sortHighScores();
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(HIGHSCORE_FILE, false))) {
+            for (String line : highScoresData) {
+                pw.println(line);
+            }
+            System.out.println("Lưu điểm cao thành công.");
+        } catch (IOException e) {
+            System.err.println("Lỗi khi ghi tệp điểm cao: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Kiểm tra xem điểm hiện tại có lọt vào bảng xếp hạng không.
+     * @param score Điểm hiện tại.
+     * @return True nếu điểm số lọt top.
+     */
+    private boolean isHighScore(int score) {
+        if (highScoresData.size() < MAX_HIGHSCORE_ENTRIES) {
+            return true;
+        }
+        try {
+            String lastEntry = highScoresData.get(highScoresData.size() - 1);
+            int lowestTopScore = Integer.parseInt(lastEntry.substring(lastEntry.lastIndexOf("-") + 1).trim());
+            return score > lowestTopScore;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    /**
+     * Xử lý kiểm tra điểm cao và mở hộp thoại nhập tên sau khi Game Over/Win.
+     */
+    private void handleNameInput() {
+        waitingForName = true;
+
+        SwingUtilities.invokeLater(() -> {
+            String message = menuManager.getText("HIGHSCORE_MSG", currentLanguage);
+            String title = menuManager.getText("GAME_TITLE", currentLanguage) + " - High Score";
+
+            String playerName = JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+
+            if (playerName != null) {
+                if (!playerName.trim().isEmpty()) {
+                    saveNewHighScore(playerName.trim(), score);
+                } else if (score > 0) {
+                    saveNewHighScore("anonymous", score);
+                }
+            }
+
+            waitingForName = false;
+            initGame();
+        });
+    }
+
+    /**
+     * Lấy danh sách chuỗi điểm cao đã được tải.
+     * @return List<String> chứa các chuỗi "Tên - Điểm".
+     */
+    public List<String> getHighScoresData() {
+        return highScoresData;
     }
 }

@@ -36,5 +36,3 @@ Người chơi điều khiển thanh đỡ để đỡ bóng, phá vỡ các lo�
 - **Space:** Phát bóng, tiếp tục game hoặc tạm dừng
 - **ESC:** Thoát game  
 - **Chuột:** Click vào menu để chọn tùy chọn
-
-🎯 Hãy chơi game và tận hưởng những trải nghiệm tuyệt vời nhất cùng Akanoid!
